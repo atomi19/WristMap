@@ -2,10 +2,9 @@
 //  WristMapApp.swift
 //  WristMap
 //
-//  Created by Anton on 29.06.2026.
-//
 
 import SwiftUI
+import SwiftData
 
 @main
 struct WristMapApp: App {
@@ -13,5 +12,6 @@ struct WristMapApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: Route.self)
     }
 }

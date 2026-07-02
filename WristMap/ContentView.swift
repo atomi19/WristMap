@@ -10,11 +10,11 @@ import CoreLocation
 import Foundation
 
 struct ContentView: View {
-    @State private var isShowingFilePicker = false
     @State private var points: [GPXPoint] = []
     @State private var locationManager = CLLocationManager()
     @State private var position: MapCameraPosition = .userLocation(followsHeading: true, fallback: .automatic)
     @State private var selectedMapStyle: SelectedMapStyle = .standard
+    @State private var isShowingRoutesLibrary = false
 
     var body: some View {
         NavigationStack {
@@ -40,39 +40,21 @@ struct ContentView: View {
                                 Text(style.rawValue).tag(style)
                             }
                         }
-                        .pickerStyle(.segmented)
-                        Button("Import GPX", systemImage: "square.and.arrow.down") {
-                            isShowingFilePicker.toggle()
+                        Button("Routes", systemImage: "map") {
+                            isShowingRoutesLibrary.toggle()
                         }
                     } label: {
                         Image(systemName: "line.3.horizontal")
                     }
                 }
             }
-            .fileImporter(
-                isPresented: $isShowingFilePicker,
-                allowedContentTypes: [.xml, .item],
-                allowsMultipleSelection: false
-            ) { result in
-                switch result {
-                case .success(let urls):
-                    guard let url = urls.first else { return }
-                    
-                    guard url.startAccessingSecurityScopedResource() else { return }
-                    defer { url.stopAccessingSecurityScopedResource() }
-                    
-                    do {
-                        let data = try Data(contentsOf: url)
-                        
-                        let parser = GPXParser()
-                        self.points = parser.parse(data: data)
-                    } catch {
-                        print("Error:", error)
+            .sheet(isPresented: $isShowingRoutesLibrary) {
+                RoutesLibraryView(
+                    onRouteTap: { gpxPoints in
+                        self.points = gpxPoints
+                        isShowingRoutesLibrary = false
                     }
-                    
-                case .failure(let error):
-                    print(error)
-                }
+                )
             }
         }
     }
@@ -94,52 +76,39 @@ enum SelectedMapStyle: String, CaseIterable, Identifiable {
     }
 }
 
-struct GPXPoint: Identifiable {
-    let id = UUID()
-    let coordinate: CLLocationCoordinate2D
-}
-
 final class GPXParser: NSObject, XMLParserDelegate {
+
     private(set) var points: [GPXPoint] = []
-    private var lat: Double?
-    private var lon: Double?
-    
-    func parse(data: Data) -> [GPXPoint] {
-        points.removeAll()
+
+    func parse(url: URL) throws -> [GPXPoint] {
+        points = []
         
-        let parser = XMLParser(data: data)
+        let parser = XMLParser(contentsOf: url)!
         parser.delegate = self
         parser.parse()
         
         return points
     }
-    
+
     func parser(
         _ parser: XMLParser,
         didStartElement elementName: String,
         namespaceURI: String?,
         qualifiedName qName: String?,
-        attributes attributeDict: [String : String] = [:]
+        attributes attributeDict: [String : String]
     ) {
-        if elementName == "trkpt" {
-            lat = Double(attributeDict["lat"] ?? "")
-            lon = Double(attributeDict["lon"] ?? "")
-        }
-    }
-    
-    func parser(
-        _ parser: XMLParser,
-        didEndElement elementName: String,
-        namespaceURI: String?,
-        qualifiedName qName: String?
-    ) {
-        if elementName == "trkpt", let lat, let lon {
-            points.append(
-                GPXPoint(
-                    coordinate: .init(latitude: lat, longitude: lon)
-                )
+        guard elementName == "trkpt",
+              let latString = attributeDict["lat"],
+              let lonString = attributeDict["lon"],
+              let lat = Double(latString),
+              let lon = Double(lonString)
+        else { return }
+
+        points.append(
+            GPXPoint(
+                coordinate: .init(latitude: lat, longitude: lon)
             )
-        }
+        )
     }
 }
 
