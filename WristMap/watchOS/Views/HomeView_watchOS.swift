@@ -17,6 +17,7 @@ struct HomeView_watchOS: View {
     var body: some View {
         NavigationStack {
             Map(position: $position) {
+                UserAnnotation()
                 if points.count >  1 {
                     MapPolyline(coordinates: points.map(\.coordinate))
                         .stroke(.blue, lineWidth: 4)
