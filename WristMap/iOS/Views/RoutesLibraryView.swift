@@ -16,6 +16,8 @@ struct RoutesLibraryView: View {
     
     let onRouteTap: ([GPXPoint]) -> Void
     
+    let watchManager = WatchConnectivityManager()
+    
     var body: some View {
         NavigationStack {
             List {
@@ -48,11 +50,19 @@ struct RoutesLibraryView: View {
                             context.delete(route)
                             try? context.save()
                         }
+                        Button("Send to Watch", systemImage: "applewatch") {
+                            let url = GPXFileManager.fileURL(for: route.uuid)
+                            
+                            watchManager.sendGPXFile(at: url)
+                        }
+                        .tint(.blue)
                     }
                 }
             }
             .navigationTitle("Routes")
+            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
+            #endif
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Add", systemImage: "plus") {
@@ -67,6 +77,11 @@ struct RoutesLibraryView: View {
                     } description: {
                         Text("Add routes and they will appear here")
                     }
+                }
+            }
+            .overlay(alignment: .bottom) {
+                 if watchManager.isTransfering {
+                     AppleWatchSendToastView()
                 }
             }
             .sheet(isPresented: $isShowingAddRoute) {

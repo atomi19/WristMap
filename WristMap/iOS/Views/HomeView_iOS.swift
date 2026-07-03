@@ -9,7 +9,7 @@ internal import UniformTypeIdentifiers
 import CoreLocation
 import Foundation
 
-struct ContentView: View {
+struct HomeView_iOS: View {
     @State private var points: [GPXPoint] = []
     @State private var locationManager = CLLocationManager()
     @State private var position: MapCameraPosition = .userLocation(followsHeading: true, fallback: .automatic)
@@ -60,7 +60,7 @@ struct ContentView: View {
     }
 }
 
-enum SelectedMapStyle: String, CaseIterable, Identifiable {
+private enum SelectedMapStyle: String, CaseIterable, Identifiable {
     case standard = "Standard"
     case imagery = "Satellite"
     case hybrid = "Hybrid"
@@ -76,42 +76,6 @@ enum SelectedMapStyle: String, CaseIterable, Identifiable {
     }
 }
 
-final class GPXParser: NSObject, XMLParserDelegate {
-
-    private(set) var points: [GPXPoint] = []
-
-    func parse(url: URL) throws -> [GPXPoint] {
-        points = []
-        
-        let parser = XMLParser(contentsOf: url)!
-        parser.delegate = self
-        parser.parse()
-        
-        return points
-    }
-
-    func parser(
-        _ parser: XMLParser,
-        didStartElement elementName: String,
-        namespaceURI: String?,
-        qualifiedName qName: String?,
-        attributes attributeDict: [String : String]
-    ) {
-        guard elementName == "trkpt",
-              let latString = attributeDict["lat"],
-              let lonString = attributeDict["lon"],
-              let lat = Double(latString),
-              let lon = Double(lonString)
-        else { return }
-
-        points.append(
-            GPXPoint(
-                coordinate: .init(latitude: lat, longitude: lon)
-            )
-        )
-    }
-}
-
 #Preview {
-    ContentView()
+    HomeView_iOS()
 }
