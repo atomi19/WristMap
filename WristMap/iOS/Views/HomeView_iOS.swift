@@ -13,8 +13,10 @@ struct HomeView_iOS: View {
     @State private var points: [GPXPoint] = []
     @State private var locationManager = CLLocationManager()
     @State private var position: MapCameraPosition = .userLocation(followsHeading: true, fallback: .automatic)
-    @State private var selectedMapStyle: SelectedMapStyle = .standard
     @State private var isShowingRoutesLibrary = false
+    
+    // settings
+    @State private var selectedMapStyle: SelectedMapStyle = Settings.mapStyle
 
     var body: some View {
         NavigationStack {
@@ -29,6 +31,9 @@ struct HomeView_iOS: View {
                 MapScaleView()
             }
             .mapStyle(selectedMapStyle.mapStyle)
+            .onChange(of: selectedMapStyle) {
+                Settings.mapStyle = selectedMapStyle
+            }
             .onAppear {
                 locationManager.requestWhenInUseAuthorization()
             }
@@ -56,22 +61,6 @@ struct HomeView_iOS: View {
                     }
                 )
             }
-        }
-    }
-}
-
-private enum SelectedMapStyle: String, CaseIterable, Identifiable {
-    case standard = "Standard"
-    case imagery = "Satellite"
-    case hybrid = "Hybrid"
-    
-    var id: String { self.rawValue }
-    
-    var mapStyle: MapStyle {
-        switch self {
-        case .standard: return .standard
-        case .imagery: return .imagery
-        case .hybrid: return .hybrid
         }
     }
 }
