@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3A0193B42FF6B0DC00BDBD6A /* WristMap Watch App Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 3A0193AA2FF6B0DB00BDBD6A /* WristMap Watch App Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		3A0193B42FF6B0DC00BDBD6A /* WristMap Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 3A0193AA2FF6B0DB00BDBD6A /* WristMap Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -27,7 +27,7 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
-				3A0193B42FF6B0DC00BDBD6A /* WristMap Watch App Watch App.app in Embed Watch Content */,
+				3A0193B42FF6B0DC00BDBD6A /* WristMap Watch App.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -35,12 +35,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		3A0193AA2FF6B0DB00BDBD6A /* WristMap Watch App Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "WristMap Watch App Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3A0193AA2FF6B0DB00BDBD6A /* WristMap Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "WristMap Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3A9030932FF2ED5100ABFF48 /* WristMap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WristMap.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		3A0193BE2FF6B54600BDBD6A /* Exceptions for "WristMap" folder in "WristMap Watch App Watch App" target */ = {
+		3A0193BE2FF6B54600BDBD6A /* Exceptions for "WristMap" folder in "WristMap Watch App" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Shared/Logic/GPXParser.swift,
@@ -53,7 +53,7 @@
 				watchOS/Views/HomeView_watchOS.swift,
 				watchOS/WristMapWatchApp.swift,
 			);
-			target = 3A0193A92FF6B0DB00BDBD6A /* WristMap Watch App Watch App */;
+			target = 3A0193A92FF6B0DB00BDBD6A /* WristMap Watch App */;
 		};
 		3A43370F2FF3E48E0091AE49 /* Exceptions for "WristMap" folder in "WristMap" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
@@ -73,7 +73,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				3A43370F2FF3E48E0091AE49 /* Exceptions for "WristMap" folder in "WristMap" target */,
-				3A0193BE2FF6B54600BDBD6A /* Exceptions for "WristMap" folder in "WristMap Watch App Watch App" target */,
+				3A0193BE2FF6B54600BDBD6A /* Exceptions for "WristMap" folder in "WristMap Watch App" target */,
 			);
 			path = WristMap;
 			sourceTree = "<group>";
@@ -110,7 +110,7 @@
 			isa = PBXGroup;
 			children = (
 				3A9030932FF2ED5100ABFF48 /* WristMap.app */,
-				3A0193AA2FF6B0DB00BDBD6A /* WristMap Watch App Watch App.app */,
+				3A0193AA2FF6B0DB00BDBD6A /* WristMap Watch App.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -118,9 +118,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		3A0193A92FF6B0DB00BDBD6A /* WristMap Watch App Watch App */ = {
+		3A0193A92FF6B0DB00BDBD6A /* WristMap Watch App */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3A0193B52FF6B0DC00BDBD6A /* Build configuration list for PBXNativeTarget "WristMap Watch App Watch App" */;
+			buildConfigurationList = 3A0193B52FF6B0DC00BDBD6A /* Build configuration list for PBXNativeTarget "WristMap Watch App" */;
 			buildPhases = (
 				3A0193A62FF6B0DB00BDBD6A /* Sources */,
 				3A0193A72FF6B0DB00BDBD6A /* Frameworks */,
@@ -130,11 +130,11 @@
 			);
 			dependencies = (
 			);
-			name = "WristMap Watch App Watch App";
+			name = "WristMap Watch App";
 			packageProductDependencies = (
 			);
 			productName = "WristMap Watch App Watch App";
-			productReference = 3A0193AA2FF6B0DB00BDBD6A /* WristMap Watch App Watch App.app */;
+			productReference = 3A0193AA2FF6B0DB00BDBD6A /* WristMap Watch App.app */;
 			productType = "com.apple.product-type.application";
 		};
 		3A9030922FF2ED5100ABFF48 /* WristMap */ = {
@@ -194,7 +194,7 @@
 			projectRoot = "";
 			targets = (
 				3A9030922FF2ED5100ABFF48 /* WristMap */,
-				3A0193A92FF6B0DB00BDBD6A /* WristMap Watch App Watch App */,
+				3A0193A92FF6B0DB00BDBD6A /* WristMap Watch App */,
 			);
 		};
 /* End PBXProject section */
@@ -236,7 +236,7 @@
 /* Begin PBXTargetDependency section */
 		3A0193B32FF6B0DC00BDBD6A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 3A0193A92FF6B0DB00BDBD6A /* WristMap Watch App Watch App */;
+			target = 3A0193A92FF6B0DB00BDBD6A /* WristMap Watch App */;
 			targetProxy = 3A0193B22FF6B0DC00BDBD6A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -252,14 +252,14 @@
 				DEVELOPMENT_TEAM = 327D6Q6KBQ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "WristMap Watch App";
+				INFOPLIST_KEY_CFBundleDisplayName = WristMap;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = io.github.atomi19.WristMap;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.atomi19.WristMap.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -271,7 +271,7 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Debug;
 		};
@@ -285,14 +285,14 @@
 				DEVELOPMENT_TEAM = 327D6Q6KBQ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "WristMap Watch App";
+				INFOPLIST_KEY_CFBundleDisplayName = WristMap;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = io.github.atomi19.WristMap;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.atomi19.WristMap.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -305,7 +305,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				VALIDATE_PRODUCT = YES;
-				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Release;
 		};
@@ -439,6 +439,8 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WristMap/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = WristMap;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.navigation";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location permission is needed to view your location on the map";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -450,11 +452,11 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.5;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.atomi19.WristMap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -485,6 +487,8 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WristMap/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = WristMap;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.navigation";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location permission is needed to view your location on the map";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -496,11 +500,11 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.5;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.atomi19.WristMap;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -520,7 +524,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		3A0193B52FF6B0DC00BDBD6A /* Build configuration list for PBXNativeTarget "WristMap Watch App Watch App" */ = {
+		3A0193B52FF6B0DC00BDBD6A /* Build configuration list for PBXNativeTarget "WristMap Watch App" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3A0193B62FF6B0DC00BDBD6A /* Debug */,
