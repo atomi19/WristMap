@@ -12,7 +12,8 @@ import Foundation
 struct HomeView_iOS: View {
     @State private var points: [GPXPoint] = []
     @State private var locationManager = CLLocationManager()
-    @State private var position: MapCameraPosition = .userLocation(followsHeading: true, fallback: .automatic)
+    @State private var trackingMode: UserTrackingModes = .follow
+    @State private var position: MapCameraPosition = .userLocation(followsHeading: false, fallback: .automatic)
     @State private var isShowingRoutesLibrary = false
     
     // settings
@@ -28,18 +29,26 @@ struct HomeView_iOS: View {
                 }
             }
             .mapControls {
-                MapUserLocationButton()
                 MapScaleView()
             }
             .mapStyle(selectedMapStyle.mapStyle)
             .onChange(of: selectedMapStyle) {
                 Settings.mapStyle = selectedMapStyle
             }
+            .onChange(of: position) {_, newValue in
+                if newValue.positionedByUser {
+                    trackingMode = .none
+                }
+            }
             .onAppear {
                 locationManager.requestWhenInUseAuthorization()
             }
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
+                ToolbarItemGroup(placement: .confirmationAction) {
+                    CustomUserLocationButton(
+                        position: $position,
+                        userTrackingMode: $trackingMode
+                    )
                     Menu {
                         Picker("Map Style", selection: $selectedMapStyle) {
                             ForEach(SelectedMapStyle.allCases) { style in

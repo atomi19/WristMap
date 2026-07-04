@@ -46,6 +46,7 @@
 				Shared/Logic/GPXParser.swift,
 				Shared/Models/GPXFileManager.swift,
 				Shared/Models/GPXPoint.swift,
+				Shared/Views/CustomUserLocationButton.swift,
 				Shared/WatchConnectivity/WatchConnectivityManager.swift,
 				Shared/WatchConnectivity/WatchSessionManager.swift,
 				watchOS/Assets.xcassets,

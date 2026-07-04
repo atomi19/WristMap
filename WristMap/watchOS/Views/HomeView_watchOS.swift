@@ -9,7 +9,8 @@ import CoreLocation
 
 struct HomeView_watchOS: View {
     @State private var locationManager = CLLocationManager()
-    @State private var position: MapCameraPosition = .userLocation(followsHeading: true, fallback: .automatic)
+    @State private var position: MapCameraPosition = .userLocation(followsHeading: false, fallback: .automatic)
+    @State private var trackingMode: UserTrackingModes = .follow
     
     @StateObject private var watchSession = WatchSessionManager()
     @State private var points: [GPXPoint] = []
@@ -35,8 +36,18 @@ struct HomeView_watchOS: View {
             .onAppear {
                 locationManager.requestWhenInUseAuthorization()
             }
-            .mapControls {
-                MapUserLocationButton()
+            .onChange(of: position) {_, newValue in
+                if newValue.positionedByUser {
+                    trackingMode = .none
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    CustomUserLocationButton(
+                        position: $position,
+                        userTrackingMode: $trackingMode
+                    )
+                }
             }
         }
     }
