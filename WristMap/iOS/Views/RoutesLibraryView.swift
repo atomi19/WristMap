@@ -14,7 +14,7 @@ struct RoutesLibraryView: View {
     
     @State private var isShowingAddRoute = false
     
-    let onRouteTap: ([GPXPoint]) -> Void
+    let onRouteTap: (Route) -> Void
     
     let watchManager = WatchConnectivityManager()
     
@@ -22,16 +22,7 @@ struct RoutesLibraryView: View {
         NavigationStack {
             List {
                 ForEach(routes) { route in
-                    Button {
-                        let url = GPXFileManager.fileURL(for: route.uuid)
-
-                        do {
-                            let points = try GPXParser().parse(url: url)
-                            onRouteTap(points)
-                        } catch {
-                            print(error)
-                        }
-                    } label: {
+                    Button { onRouteTap(route) } label: {
                         HStack {
                             Image(systemName: "map")
                                 .foregroundStyle(.secondary)
@@ -46,14 +37,10 @@ struct RoutesLibraryView: View {
                     .buttonStyle(.plain)
                     .swipeActions(edge: .trailing) {
                         Button("Delete", systemImage: "trash", role: .destructive) {
-                            GPXFileManager.deleteGPXFile(for: route.uuid)
-                            context.delete(route)
-                            try? context.save()
+                            deleteRoute(route)
                         }
                         Button("Send to Watch", systemImage: "applewatch") {
-                            let url = GPXFileManager.fileURL(for: route.uuid)
-                            
-                            watchManager.sendGPXFile(at: url)
+                            sendToWatch(route)
                         }
                         .tint(.blue)
                     }
@@ -89,5 +76,17 @@ struct RoutesLibraryView: View {
                     .presentationDetents([.medium])
             }
         }
+    }
+    
+    private func deleteRoute(_ route: Route) {
+        GPXFileManager.deleteGPXFile(for: route.uuid)
+        context.delete(route)
+        try? context.save()
+    }
+    
+    private func sendToWatch(_ route: Route) {
+        let url = GPXFileManager.fileURL(for: route.uuid)
+        
+        watchManager.sendGPXFile(at: url)
     }
 }

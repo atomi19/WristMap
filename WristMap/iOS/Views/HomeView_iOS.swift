@@ -11,6 +11,8 @@ import Foundation
 
 struct HomeView_iOS: View {
     @State private var points: [GPXPoint] = []
+    @State private var selectedRoute: Route? = nil
+    
     @State private var locationManager = CLLocationManager()
     @State private var trackingMode: UserTrackingModes = .follow
     @State private var position: MapCameraPosition = .userLocation(followsHeading: false, fallback: .automatic)
@@ -26,6 +28,20 @@ struct HomeView_iOS: View {
                 if points.count > 1 {
                     MapPolyline(coordinates: points.map(\.coordinate))
                         .stroke(.blue, lineWidth: 4)
+                }
+            }
+            .task(id: selectedRoute?.uuid) {
+                guard let route = selectedRoute else {
+                    points = []
+                    return
+                }
+                
+                do {
+                    let url = GPXFileManager.fileURL(for: route.uuid)
+                    points = try GPXParser().parse(url: url)
+                } catch {
+                    points = []
+                    print(error)
                 }
             }
             .mapControls {
@@ -65,11 +81,19 @@ struct HomeView_iOS: View {
             }
             .sheet(isPresented: $isShowingRoutesLibrary) {
                 RoutesLibraryView(
-                    onRouteTap: { gpxPoints in
-                        self.points = gpxPoints
+                    onRouteTap: { route in
+                        self.selectedRoute = route
                         isShowingRoutesLibrary = false
                     }
                 )
+            }
+            .safeAreaInset(edge: .bottom) {
+                if let route = selectedRoute {
+                    RouteInfoView(route: route) {
+                        selectedRoute = nil
+                        points = []
+                    }
+                }
             }
         }
     }
