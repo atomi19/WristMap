@@ -21,7 +21,9 @@ struct CustomUserLocationButton: View {
                 userTrackingMode = .none
             }
             
-            position = userTrackingMode.cameraPosition
+            withAnimation(.easeInOut) {
+                position = userTrackingMode.cameraPosition
+            }
         } label: {
             switch userTrackingMode {
             case .none:
@@ -35,7 +37,7 @@ struct CustomUserLocationButton: View {
     }
 }
 
-enum UserTrackingModes {
+enum UserTrackingModes: String {
     case none
     case follow
     case followWithHeading

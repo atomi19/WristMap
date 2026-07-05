@@ -18,6 +18,8 @@ struct HomeView_iOS: View {
     @State private var position: MapCameraPosition = .userLocation(followsHeading: false, fallback: .automatic)
     @State private var isShowingRoutesLibrary = false
     
+    @State private var isRouteRecenterActive: Bool = false
+    
     // settings
     @State private var selectedMapStyle: SelectedMapStyle = Settings.mapStyle
 
@@ -53,6 +55,7 @@ struct HomeView_iOS: View {
             }
             .onChange(of: position) {_, newValue in
                 if newValue.positionedByUser {
+                    isRouteRecenterActive = false
                     trackingMode = .none
                 }
             }
@@ -89,13 +92,38 @@ struct HomeView_iOS: View {
             }
             .safeAreaInset(edge: .bottom) {
                 if let route = selectedRoute {
-                    RouteInfoView(route: route) {
-                        selectedRoute = nil
-                        points = []
-                    }
+                    RouteInfoView(
+                        route: route,
+                        isRouteRecenterActive: $isRouteRecenterActive,
+                        onClose: {
+                            selectedRoute = nil
+                            points = []
+                        },
+                        onRouteRecenter: recenterOnRoute
+                    )
                 }
             }
         }
+    }
+    
+    private func recenterOnRoute() {
+        var rect = MKMapRect.null
+        trackingMode = .none
+        
+        for point in points {
+            rect = rect.union(
+                MKMapRect(
+                    origin: MKMapPoint(point.coordinate),
+                    size: MKMapSize(width: 1, height: 1)
+                )
+            )
+        }
+        
+        withAnimation(.easeInOut) {
+            position = .rect(rect)
+        }
+        
+        isRouteRecenterActive = true
     }
 }
 

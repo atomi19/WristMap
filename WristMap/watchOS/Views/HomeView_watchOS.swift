@@ -14,6 +14,7 @@ struct HomeView_watchOS: View {
     
     @StateObject private var watchSession = WatchSessionManager()
     @State private var points: [GPXPoint] = []
+    @State private var isRouteRecenterActive: Bool = false
     
     var body: some View {
         NavigationStack {
@@ -38,18 +39,50 @@ struct HomeView_watchOS: View {
             }
             .onChange(of: position) {_, newValue in
                 if newValue.positionedByUser {
+                    isRouteRecenterActive = false
                     trackingMode = .none
                 }
             }
             .toolbar {
+                // location 
                 ToolbarItem(placement: .topBarLeading) {
                     CustomUserLocationButton(
                         position: $position,
                         userTrackingMode: $trackingMode
                     )
                 }
+                // route recenter
+                if points.count > 1 {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button(
+                            "Recenter",
+                            systemImage: isRouteRecenterActive ? "map.fill" : "map",
+                            action: recenterOnRoute
+                        )
+                    }
+                }
             }
         }
+    }
+    
+    private func recenterOnRoute() {
+        var rect = MKMapRect.null
+        trackingMode = .none
+        
+        for point in points {
+            rect = rect.union(
+                MKMapRect(
+                    origin: MKMapPoint(point.coordinate),
+                    size: MKMapSize(width: 1, height: 1)
+                )
+            )
+        }
+        
+        withAnimation(.easeInOut) {
+            position = .rect(rect)
+        }
+        
+        isRouteRecenterActive = true
     }
 }
 

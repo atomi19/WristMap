@@ -8,12 +8,15 @@ import CoreLocation
 
 struct RouteInfoView: View {
     let route: Route
+    @Binding var isRouteRecenterActive: Bool
     let onClose: () -> Void
+    let onRouteRecenter: () -> Void
     
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: "map")
-                .foregroundStyle(.blue)
+            Button(action: onRouteRecenter) {
+                Image(systemName: isRouteRecenterActive ? "map.fill" : "map")
+            }
             
             VStack(alignment: .leading) {
                 Text(route.routeName)
@@ -31,15 +34,4 @@ struct RouteInfoView: View {
         .background(.regularMaterial)
         .clipShape(.capsule)
     }
-}
-
-#Preview {
-    RouteInfoView(
-        route: Route(
-            routeName: "Route Preview 1",
-            gpxFilename: "",
-            distance: 25000
-        ),
-        onClose: {}
-    )
 }
