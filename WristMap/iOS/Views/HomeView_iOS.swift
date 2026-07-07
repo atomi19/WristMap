@@ -30,6 +30,18 @@ struct HomeView_iOS: View {
                 if points.count > 1 {
                     MapPolyline(coordinates: points.map(\.coordinate))
                         .stroke(.blue, lineWidth: 4)
+                    // start annotation marker
+                    if let point = points.first {
+                        Annotation("", coordinate: point.coordinate) {
+                            CustomAnnotation(textLabel: "Start")
+                        }
+                    }
+                    // end annotation marker
+                    if let point = points.last {
+                        Annotation("", coordinate: point.coordinate) {
+                            CustomAnnotation(textLabel: "End")
+                        }
+                    }
                 }
             }
             .task(id: selectedRoute?.uuid) {
@@ -124,6 +136,21 @@ struct HomeView_iOS: View {
         }
         
         isRouteRecenterActive = true
+    }
+}
+
+private struct CustomAnnotation: View {
+    let textLabel: String
+    
+    var body: some View {
+        Text(textLabel)
+            .font(.caption.weight(.bold))
+            .foregroundStyle(.primary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(.regularMaterial)
+            .clipShape(Capsule())
+            .shadow(radius: 3)
     }
 }
 

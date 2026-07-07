@@ -44,7 +44,7 @@ struct HomeView_watchOS: View {
                 }
             }
             .toolbar {
-                // location 
+                // location
                 ToolbarItem(placement: .topBarLeading) {
                     CustomUserLocationButton(
                         position: $position,

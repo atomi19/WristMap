@@ -20,8 +20,9 @@ struct RouteInfoView: View {
             
             VStack(alignment: .leading) {
                 Text(route.routeName)
+                    .font(.subheadline.bold())
                 Text("\(route.distance / 1000, specifier: "%.2f") km")
-                    .font(.subheadline)
+                    .font(.caption.weight(.bold))
                     .foregroundStyle(.secondary)
             }
             
@@ -32,6 +33,7 @@ struct RouteInfoView: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
         .background(.regularMaterial)
-        .clipShape(.capsule)
+        .clipShape(Capsule())
+        .shadow(radius: 3)
     }
 }
