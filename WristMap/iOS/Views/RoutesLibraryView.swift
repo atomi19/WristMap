@@ -35,14 +35,16 @@ struct RoutesLibraryView: View {
                         }
                     }
                     .buttonStyle(.plain)
-                    .swipeActions(edge: .trailing) {
-                        Button("Delete", systemImage: "trash", role: .destructive) {
-                            deleteRoute(route)
-                        }
+                    .swipeActions(edge: .leading) {
                         Button("Send to Watch", systemImage: "applewatch") {
                             sendToWatch(route)
                         }
                         .tint(.blue)
+                    }
+                    .swipeActions(edge: .trailing) {
+                        Button("Delete", systemImage: "trash", role: .destructive) {
+                            deleteRoute(route)
+                        }
                     }
                 }
             }

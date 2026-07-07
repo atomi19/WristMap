@@ -253,6 +253,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = WristMap;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location permission is needed to view your location on the map";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = io.github.atomi19.WristMap;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -286,6 +287,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = WristMap;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location permission is needed to view your location on the map";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = io.github.atomi19.WristMap;
 				LD_RUNPATH_SEARCH_PATHS = (
