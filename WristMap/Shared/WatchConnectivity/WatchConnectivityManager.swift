@@ -22,7 +22,6 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     
     func sendGPXFile(at url: URL) {
         isTransfering = true
-        print(isTransfering)
         session.transferFile(url, metadata: nil)
     }
     
@@ -35,7 +34,6 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
     ) {
         Task { @MainActor in
             isTransfering = false
-            print(isTransfering)
         }
     }
     
