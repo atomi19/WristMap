@@ -120,7 +120,7 @@ struct AddRouteView: View {
         }
     }
     
-    func importFile(from url: URL) {
+    private func importFile(from url: URL) {
         do {
             let originalFileName: String = url.deletingPathExtension().lastPathComponent
             
@@ -154,7 +154,7 @@ struct AddRouteView: View {
         }
     }
     
-    func calculateDistance(points: [GPXPoint]) -> Double{
+    private func calculateDistance(points: [GPXPoint]) -> Double{
         guard points.count > 1 else { return 0 }
         
         var total: Double = 0

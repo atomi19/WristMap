@@ -22,24 +22,38 @@ struct HomeView_iOS: View {
     
     // settings
     @State private var selectedMapStyle: SelectedMapStyle = Settings.mapStyle
+    
+    // route distance markers (km)
+    @State private var routeDistanceMarkers: [RouteDistanceMarker] = []
 
     var body: some View {
         NavigationStack {
             Map(position: $position) {
+                // user location
                 UserAnnotation()
                 if points.count > 1 {
+                    // route
                     MapPolyline(coordinates: points.map(\.coordinate))
                         .stroke(.blue, lineWidth: 4)
                     // start annotation marker
                     if let point = points.first {
                         Annotation("", coordinate: point.coordinate) {
-                            CustomAnnotation(textLabel: "Start")
+                            CustomAnnotationView(textLabel: "Start")
+                        }
+                    }
+                    // distance annotations
+                    if !routeDistanceMarkers.isEmpty {
+                        ForEach(routeDistanceMarkers) { distanceMarker in
+                            let formattedDistance = String(format: "%.0f", distanceMarker.distance)
+                            Annotation("", coordinate: distanceMarker.coordinate) {
+                                RouteDistanceMarkerView(textLabel: "\(formattedDistance) km")
+                            }
                         }
                     }
                     // end annotation marker
                     if let point = points.last {
                         Annotation("", coordinate: point.coordinate) {
-                            CustomAnnotation(textLabel: "End")
+                            CustomAnnotationView(textLabel: "End")
                         }
                     }
                 }
@@ -53,6 +67,7 @@ struct HomeView_iOS: View {
                 do {
                     let url = GPXFileManager.fileURL(for: route.uuid)
                     points = try GPXParser().parse(url: url)
+                    calculateDistanceMarkers(route: route)
                 } catch {
                     points = []
                     print(error)
@@ -137,9 +152,87 @@ struct HomeView_iOS: View {
         
         isRouteRecenterActive = true
     }
+    
+    // calculate coordinates for distance markers on route
+    private func calculateDistanceMarkers(route: Route) {
+        let totalDistance = route.distance / 1000
+        
+        let targetMarkers = 10.0
+        let rawInterval = totalDistance / targetMarkers
+        
+        let niceIntervals: [Double] = [
+            1, 2, 5, 10, 20, 25, 50, 100
+        ]
+        
+        let interval = niceIntervals.first(where: { $0 >= rawInterval }) ?? 100
+        
+        // count from interval by interval to total route distance
+        let markerDistances = Array(
+            stride(
+                from: interval,
+                to: totalDistance,
+                by: interval
+            )
+        )
+        
+        var markerIndex = 0
+        var distance: Double = 0
+        routeDistanceMarkers.removeAll()
+        
+        // go through GPX points
+        // and add distance marker if a target distance is reached
+        for i in 1..<points.count {
+            let start = CLLocation(
+                latitude: points[i - 1].coordinate.latitude,
+                longitude: points[i - 1].coordinate.longitude
+            )
+            
+            let end = CLLocation(
+                latitude: points[i].coordinate.latitude,
+                longitude: points[i].coordinate.longitude
+            )
+            
+            distance += start.distance(from: end)
+            
+            while markerIndex < markerDistances.count &&
+                    distance >= markerDistances[markerIndex] * 1000 {
+                routeDistanceMarkers.append(
+                    RouteDistanceMarker(
+                        distance: markerDistances[markerIndex],
+                        coordinate: points[i].coordinate
+                    )
+                )
+                
+                markerIndex += 1
+            }
+        }
+    }
 }
 
-private struct CustomAnnotation: View {
+private struct RouteDistanceMarker: Identifiable {
+    let id = UUID()
+    let distance: Double // distance in km
+    let coordinate: CLLocationCoordinate2D
+}
+
+// km annotations on route
+private struct RouteDistanceMarkerView: View {
+    let textLabel: String
+    
+    var body: some View {
+        Text(textLabel)
+            .font(.caption2)
+            .foregroundStyle(.primary)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 3)
+            .background(.regularMaterial)
+            .clipShape(Capsule())
+            .shadow(radius: 3)
+    }
+}
+
+// start and end route annotations
+private struct CustomAnnotationView: View {
     let textLabel: String
     
     var body: some View {
