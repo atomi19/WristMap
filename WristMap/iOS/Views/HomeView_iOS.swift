@@ -17,8 +17,9 @@ struct HomeView_iOS: View {
     @State private var trackingMode: UserTrackingModes = .follow
     @State private var position: MapCameraPosition = .userLocation(followsHeading: false, fallback: .automatic)
     @State private var isShowingRoutesLibrary = false
-    
     @State private var isRouteRecenterActive: Bool = false
+    @State private var isShowingRouteDetails: Bool = false
+    @State private var routeDetailsSelectedDetent: PresentationDetent = .height(75)
     
     // settings
     @State private var selectedMapStyle: SelectedMapStyle = Settings.mapStyle
@@ -68,6 +69,7 @@ struct HomeView_iOS: View {
                     let url = GPXFileManager.fileURL(for: route.uuid)
                     points = try GPXParser().parse(url: url)
                     calculateDistanceMarkers(route: route)
+                    isShowingRouteDetails = true
                 } catch {
                     points = []
                     print(error)
@@ -117,17 +119,29 @@ struct HomeView_iOS: View {
                     }
                 )
             }
-            .safeAreaInset(edge: .bottom) {
-                if let route = selectedRoute {
-                    RouteInfoView(
+            .sheet(isPresented: $isShowingRouteDetails) {
+                if let route = selectedRoute {                
+                    RouteDetailsView(
                         route: route,
                         isRouteRecenterActive: $isRouteRecenterActive,
                         onClose: {
                             selectedRoute = nil
+                            isShowingRouteDetails = false
                             points = []
                         },
-                        onRouteRecenter: recenterOnRoute
+                        onRouteRecenter: recenterOnRoute,
+                        selectedDetents: routeDetailsSelectedDetent,
+                        points: points
                     )
+                    .presentationDetents(
+                        [
+                            .height(75),
+                            .height(225)
+                        ],
+                        selection: $routeDetailsSelectedDetent
+                    )
+                    .presentationBackgroundInteraction(.enabled(upThrough: .height(225)))
+                    .interactiveDismissDisabled()
                 }
             }
         }
