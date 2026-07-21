@@ -83,7 +83,10 @@ class LocationTracker: NSObject, ObservableObject, CLLocationManagerDelegate {
         timer = nil
     }
     
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    func locationManager(
+        _ manager: CLLocationManager,
+        didUpdateLocations locations: [CLLocation]
+    ) {
         guard trackerStatus == .active else {return}
         
         guard let location = locations.last else {return}

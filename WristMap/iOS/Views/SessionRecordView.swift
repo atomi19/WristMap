@@ -81,21 +81,19 @@ struct SessionRecordView: View {
                             dataText: DataFormatter.distance(tracker.distance)
                         )
                         SessionDetailsTextView(
-                            label: "Avg Speed",
-                            dataText: DataFormatter.speed(tracker.averageSpeed)
+                            label: "Duration",
+                            dataText: DataFormatter.duration(tracker.duration)
                         )
                     }
                     Spacer()
-                    VStack(alignment: .leading) {
-                        VStack(alignment: .leading, spacing: 16) {
-                            SessionDetailsTextView(
-                                label: "Duration",
-                                dataText: DataFormatter.duration(tracker.duration)
-                            )
-                        }
+                    VStack(alignment: .leading, spacing: 16) {
                         SessionDetailsTextView(
-                            label: "Moving",
-                            dataText: DataFormatter.duration(tracker.duration)
+                            label: "Avg Speed",
+                            dataText: DataFormatter.speed(tracker.averageSpeed)
+                        )
+                        SessionDetailsTextView(
+                            label: "Max Speed",
+                            dataText: DataFormatter.speed(tracker.maxSpeed)
                         )
                     }
                 }
