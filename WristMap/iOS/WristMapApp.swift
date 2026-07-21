@@ -15,6 +15,6 @@ struct WristMapApp: App {
             HomeView_iOS()
                 .environment(watchConnectivityManager)
         }
-        .modelContainer(for: Route.self)
+        .modelContainer(for: [Route.self, Session.self])
     }
 }

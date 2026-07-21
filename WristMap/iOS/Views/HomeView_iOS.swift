@@ -8,18 +8,44 @@ import MapKit
 internal import UniformTypeIdentifiers
 import CoreLocation
 import Foundation
+import SwiftData
+
+enum ActiveSheet: Identifiable {
+    var id: Self { self }
+    
+    case routesLibrary
+    case routeDetails
+    case sessionRecord
+    case sessionDetails
+}
+
+struct SheetDetent {
+    var routeDetails: PresentationDetent = .height(75)
+    var sessionRecord: PresentationDetent = .height(75)
+    var sessionDetails: PresentationDetent = .height(75)
+}
 
 struct HomeView_iOS: View {
-    @State private var points: [GPXPoint] = []
+    @StateObject private var tracker = LocationTracker()
+    
     @State private var selectedRoute: Route? = nil
+    @State private var points: [GPXPoint] = []
+    
+    @State private var selectedSession: Session? = nil
+    @State private var sessionPoints: [CLLocation] = []
+    @State private var isSessionRestored: Bool = false
     
     @State private var locationManager = CLLocationManager()
     @State private var trackingMode: UserTrackingModes = .follow
     @State private var position: MapCameraPosition = .userLocation(followsHeading: false, fallback: .automatic)
-    @State private var isShowingRoutesLibrary = false
+    
     @State private var isRouteRecenterActive: Bool = false
-    @State private var isShowingRouteDetails: Bool = false
-    @State private var routeDetailsSelectedDetent: PresentationDetent = .height(75)
+    
+    @State private var activeSheet: ActiveSheet?
+    @State private var sheetDetent = SheetDetent()
+    
+    @Query(sort: \Session.startedAt, order: .reverse)
+    private var sessions: [Session]
     
     // settings
     @State private var selectedMapStyle: SelectedMapStyle = Settings.mapStyle
@@ -29,36 +55,14 @@ struct HomeView_iOS: View {
 
     var body: some View {
         NavigationStack {
-            Map(position: $position) {
-                // user location
-                UserAnnotation()
-                if points.count > 1 {
-                    // route
-                    MapPolyline(coordinates: points.map(\.coordinate))
-                        .stroke(.blue, lineWidth: 4)
-                    // start annotation marker
-                    if let point = points.first {
-                        Annotation("", coordinate: point.coordinate) {
-                            CustomAnnotationView(textLabel: "Start")
-                        }
-                    }
-                    // distance annotations
-                    if !routeDistanceMarkers.isEmpty {
-                        ForEach(routeDistanceMarkers) { distanceMarker in
-                            let formattedDistance = String(format: "%.0f", distanceMarker.distance)
-                            Annotation("", coordinate: distanceMarker.coordinate) {
-                                RouteDistanceMarkerView(textLabel: "\(formattedDistance) km")
-                            }
-                        }
-                    }
-                    // end annotation marker
-                    if let point = points.last {
-                        Annotation("", coordinate: point.coordinate) {
-                            CustomAnnotationView(textLabel: "End")
-                        }
-                    }
-                }
-            }
+            HomeMapView(
+                tracker: tracker,
+                position: $position,
+                points: points,
+                sessionPoints: sessionPoints,
+                trackingPoints: tracker.locationHistory,
+                routeDistanceMarkers: routeDistanceMarkers
+            )
             .task(id: selectedRoute?.uuid) {
                 guard let route = selectedRoute else {
                     points = []
@@ -69,10 +73,31 @@ struct HomeView_iOS: View {
                     let url = GPXFileManager.fileURL(for: route.uuid)
                     points = try GPXParser().parse(url: url)
                     calculateDistanceMarkers(route: route)
-                    isShowingRouteDetails = true
+                    activeSheet = .routeDetails
                 } catch {
                     points = []
                     print(error)
+                }
+            }
+            .task(id: selectedSession?.uuid) {
+                guard let session = selectedSession else {
+                    sessionPoints = []
+                    return
+                }
+                
+                let sortedSession = session.sessionPoints.sorted { $0.timestamp < $1.timestamp }
+                
+                sessionPoints = sortedSession.map { point in
+                    CLLocation(
+                        coordinate: CLLocationCoordinate2D(
+                            latitude: point.latitude,
+                            longitude: point.longitude
+                        ),
+                        altitude: point.elevation,
+                        horizontalAccuracy: 0,
+                        verticalAccuracy: 0,
+                        timestamp: point.timestamp
+                    )
                 }
             }
             .mapControls {
@@ -82,7 +107,7 @@ struct HomeView_iOS: View {
             .onChange(of: selectedMapStyle) {
                 Settings.mapStyle = selectedMapStyle
             }
-            .onChange(of: position) {_, newValue in
+            .onChange(of: position) { _ , newValue in
                 if newValue.positionedByUser {
                     isRouteRecenterActive = false
                     trackingMode = .none
@@ -90,6 +115,29 @@ struct HomeView_iOS: View {
             }
             .onAppear {
                 locationManager.requestWhenInUseAuthorization()
+                
+                if let lastSession = sessions.first {
+                    if lastSession.finishedAt == nil {
+                        let sortedSession = lastSession.sessionPoints.sorted {$0.timestamp < $1.timestamp}
+                        sessionPoints = sortedSession.map { point in
+                            CLLocation(
+                                coordinate: CLLocationCoordinate2D(
+                                    latitude: point.latitude,
+                                    longitude: point.longitude
+                                ),
+                                altitude: point.elevation,
+                                horizontalAccuracy: 0,
+                                verticalAccuracy: 0,
+                                timestamp: point.timestamp
+                            )
+                        }
+                        tracker.locationHistory = sessionPoints
+                        
+                        selectedSession = lastSession
+                        activeSheet = .sessionRecord
+                        isSessionRestored = true
+                    }
+                }
             }
             .toolbar {
                 ToolbarItemGroup(placement: .confirmationAction) {
@@ -104,44 +152,69 @@ struct HomeView_iOS: View {
                             }
                         }
                         Button("Routes", systemImage: "map") {
-                            isShowingRoutesLibrary.toggle()
+                            activeSheet = .routesLibrary
+                        }
+                        Button("Session", systemImage: "location.viewfinder") {
+                            activeSheet = .sessionRecord
                         }
                     } label: {
                         Image(systemName: "line.3.horizontal")
                     }
                 }
             }
-            .sheet(isPresented: $isShowingRoutesLibrary) {
-                RoutesLibraryView(
-                    onRouteTap: { route in
-                        self.selectedRoute = route
-                        isShowingRoutesLibrary = false
-                    }
-                )
-            }
-            .sheet(isPresented: $isShowingRouteDetails) {
-                if let route = selectedRoute {                
-                    RouteDetailsView(
-                        route: route,
-                        isRouteRecenterActive: $isRouteRecenterActive,
-                        onClose: {
-                            selectedRoute = nil
-                            isShowingRouteDetails = false
-                            points = []
+            .sheet(item: $activeSheet) { sheet in
+                switch sheet {
+                case .routesLibrary:
+                    RoutesLibraryView(
+                        sessions: sessions,
+                        onRouteTap: { route in
+                            self.selectedRoute = route
+                            activeSheet = nil
                         },
-                        onRouteRecenter: recenterOnRoute,
-                        selectedDetents: routeDetailsSelectedDetent,
-                        points: points
+                        onSessionTap: { session in
+                            selectedSession = session
+                            activeSheet = .sessionDetails
+                        }
                     )
-                    .presentationDetents(
-                        [
-                            .height(75),
-                            .height(225)
-                        ],
-                        selection: $routeDetailsSelectedDetent
+                case .routeDetails:
+                    if let route = selectedRoute {
+                        RouteDetailsView(
+                            route: route,
+                            isRouteRecenterActive: $isRouteRecenterActive,
+                            selectedDetents: sheetDetent.routeDetails,
+                            points: points,
+                            onClose: {
+                                selectedRoute = nil
+                                activeSheet = nil
+                                points = []
+                            },
+                            onRouteRecenter: recenterOnRoute,
+                            onTrackingSelected: {
+                                activeSheet = .sessionRecord
+                            }
+                        )
+                        .bottomSheetStyle(selectedDetent: $sheetDetent.routeDetails)
+                    }
+                case .sessionRecord:
+                    SessionRecordView(
+                        tracker: tracker,
+                        selectedDetents: $sheetDetent.sessionRecord,
+                        activeSession: $selectedSession,
+                        isSessionRestored: $isSessionRestored,
                     )
-                    .presentationBackgroundInteraction(.enabled(upThrough: .height(225)))
-                    .interactiveDismissDisabled()
+                    .bottomSheetStyle(selectedDetent: $sheetDetent.sessionRecord)
+                case .sessionDetails:
+                    if let session = selectedSession {
+                        SessionDetailsView(
+                            session: session,
+                            selectedDetents: sheetDetent.sessionDetails,
+                            onClose: {
+                                activeSheet = nil
+                                sessionPoints.removeAll()
+                            }
+                        )
+                        .bottomSheetStyle(selectedDetent: $sheetDetent.sessionDetails)
+                    }
                 }
             }
         }
@@ -223,43 +296,31 @@ struct HomeView_iOS: View {
     }
 }
 
-private struct RouteDistanceMarker: Identifiable {
-    let id = UUID()
-    let distance: Double // distance in km
-    let coordinate: CLLocationCoordinate2D
-}
-
-// km annotations on route
-private struct RouteDistanceMarkerView: View {
-    let textLabel: String
+private struct BottomSheetView: ViewModifier {
+    @Binding var selectedDetent: PresentationDetent
     
-    var body: some View {
-        Text(textLabel)
-            .font(.caption2)
-            .foregroundStyle(.primary)
-            .padding(.horizontal, 6)
-            .padding(.vertical, 3)
-            .background(.regularMaterial)
-            .clipShape(Capsule())
-            .shadow(radius: 3)
+    func body(content: Content) -> some View {
+        content
+            .presentationDetents(
+                [
+                    .height(75),
+                    .height(250)
+                ],
+                selection: $selectedDetent
+            )
+            .presentationBackgroundInteraction(.enabled(upThrough: .height(250)))
+            .interactiveDismissDisabled()
     }
 }
 
-// start and end route annotations
-private struct CustomAnnotationView: View {
-    let textLabel: String
-    
-    var body: some View {
-        Text(textLabel)
-            .font(.caption.weight(.bold))
-            .foregroundStyle(.primary)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
-            .background(.regularMaterial)
-            .clipShape(Capsule())
-            .shadow(radius: 3)
+extension View {
+    func bottomSheetStyle(
+        selectedDetent: Binding<PresentationDetent>
+    ) -> some View {
+        self.modifier(BottomSheetView(selectedDetent: selectedDetent))
     }
 }
+
 
 #Preview {
     HomeView_iOS()

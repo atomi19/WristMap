@@ -43,10 +43,17 @@
 		3A0193BE2FF6B54600BDBD6A /* Exceptions for "WristMap" folder in "WristMap Watch App" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				iOS/Views/SessionDetailsView.swift,
 				Shared/Logic/GPXParser.swift,
+				Shared/Models/DataFormatter.swift,
 				Shared/Models/GPXFileManager.swift,
 				Shared/Models/GPXPoint.swift,
+				Shared/Models/LocationTracker.swift,
+				Shared/Models/Route.swift,
+				Shared/Models/Session.swift,
+				Shared/Models/SessionPoint.swift,
 				Shared/Views/CustomUserLocationButton.swift,
+				Shared/Views/SessionDetailsTextView.swift,
 				Shared/WatchConnectivity/WatchConnectivityManager.swift,
 				Shared/WatchConnectivity/WatchSessionManager.swift,
 				watchOS/Assets.xcassets,
@@ -443,6 +450,7 @@
 				INFOPLIST_FILE = WristMap/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = WristMap;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.navigation";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Location permission in the background is needed to track your sessions";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location permission is needed to view your location on the map";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -491,6 +499,7 @@
 				INFOPLIST_FILE = WristMap/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = WristMap;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.navigation";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Location permission in the background is needed to track your sessions";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location permission is needed to view your location on the map";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;

@@ -34,6 +34,7 @@ GPX navigation app for cyclists. Import GPX routes on iPhone and navigate with y
 git clone https://github.com/atomi19/WristMap.git
 ```
 
+
 2. Navigate to the project directory:
 ```bash
 cd WristMap

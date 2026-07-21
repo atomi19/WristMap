@@ -46,7 +46,9 @@ struct AddRouteView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Discard", systemImage: "xmark") {
-                        if !routeName.isEmpty || routeDraft != nil {
+                        if !routeName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+                            routeDraft != nil
+                        {
                             isShowingDiscardDialog = true
                         } else {
                             dismiss()
@@ -63,35 +65,7 @@ struct AddRouteView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Confirm", systemImage: "checkmark") {
-                        guard let draft = routeDraft else { return }
-                        
-                        do {
-                            let route = Route(
-                                routeName: routeName,
-                                gpxFilename: "",
-                                distance: draft.distance
-                            )
-                            
-                            try GPXFileManager.saveGPX(
-                                from: draft.temporaryGPXURL,
-                                routeFileId: route.uuid
-                            )
-                            context.insert(route)
-                            
-                            try context.save()
-                            
-                            // remove temporary file
-                            try? FileManager.default.removeItem(at: draft.temporaryGPXURL)
-                            
-                            routeDraft = nil
-                            routeName = ""
-                            
-                            didUserSavedRoute = true
-                            
-                            dismiss()
-                        } catch {
-                            print(error)
-                        }
+                        saveRoute()
                     }
                     .disabled(routeName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
@@ -117,6 +91,38 @@ struct AddRouteView: View {
                     print(error)
                 }
             }
+        }
+    }
+    
+    private func saveRoute() {
+        guard let draft = routeDraft else { return }
+        
+        do {
+            let route = Route(
+                routeName: routeName,
+                gpxFilename: "",
+                distance: draft.distance
+            )
+            
+            try GPXFileManager.saveGPX(
+                from: draft.temporaryGPXURL,
+                routeFileId: route.uuid
+            )
+            context.insert(route)
+            
+            try context.save()
+            
+            // remove temporary file
+            try? FileManager.default.removeItem(at: draft.temporaryGPXURL)
+            
+            routeDraft = nil
+            routeName = ""
+            
+            didUserSavedRoute = true
+            
+            dismiss()
+        } catch {
+            print(error)
         }
     }
     

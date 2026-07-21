@@ -10,10 +10,12 @@ import CoreLocation
 struct RouteDetailsView: View {
     let route: Route
     @Binding var isRouteRecenterActive: Bool
-    let onClose: () -> Void
-    let onRouteRecenter: () -> Void
     let selectedDetents: PresentationDetent
     let points: [GPXPoint]
+    
+    let onClose: () -> Void
+    let onRouteRecenter: () -> Void
+    let onTrackingSelected: () -> Void
     
     var elevationPoints: [ElevationPoint] {
         guard points.count > 1 else { return [] }
@@ -79,7 +81,7 @@ struct RouteDetailsView: View {
                     VStack {
                         Text(route.routeName)
                             .font(.title3)
-                        Text("\(route.distance / 1000, specifier: "%.2f") km")
+                        Text(DataFormatter.distance(route.distance))
                             .font(.subheadline.weight(.bold))
                             .foregroundStyle(.secondary)
                     }
