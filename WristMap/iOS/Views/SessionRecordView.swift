@@ -11,8 +11,7 @@ struct SessionRecordView: View {
     @Environment(\.modelContext) private var context
     
     @ObservedObject var tracker: LocationTracker
-    @Binding var selectedDetents: PresentationDetent
-    
+    var selectedDetents: PresentationDetent
     @Binding var activeSession: Session?
     @Binding var isSessionRestored: Bool
     

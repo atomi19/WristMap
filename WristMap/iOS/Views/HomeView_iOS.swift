@@ -163,7 +163,11 @@ struct HomeView_iOS: View {
                             activeSheet = .routesLibrary
                         }
                         Button("Session", systemImage: "location.viewfinder") {
-                            activeSheet = .sessionRecord
+                            activeSheet = nil
+                            
+                            DispatchQueue.main.async {
+                                activeSheet = .sessionRecord
+                            }
                         }
                     } label: {
                         Image(systemName: "line.3.horizontal")
@@ -210,7 +214,7 @@ struct HomeView_iOS: View {
         case .sessionRecord:
             SessionRecordView(
                 tracker: tracker,
-                selectedDetents: $sheetDetent.sessionRecord,
+                selectedDetents: sheetDetent.sessionRecord,
                 activeSession: $selectedSession,
                 isSessionRestored: $isSessionRestored,
             )
