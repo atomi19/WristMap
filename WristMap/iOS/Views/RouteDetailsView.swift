@@ -12,10 +12,8 @@ struct RouteDetailsView: View {
     @Binding var isRouteRecenterActive: Bool
     let selectedDetents: PresentationDetent
     let points: [GPXPoint]
-    
     let onClose: () -> Void
-    let onRouteRecenter: () -> Void
-    let onTrackingSelected: () -> Void
+    let recenter: ([CLLocationCoordinate2D]) -> Void
     
     var elevationPoints: [ElevationPoint] {
         guard points.count > 1 else { return [] }
@@ -87,7 +85,9 @@ struct RouteDetailsView: View {
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: onRouteRecenter) {
+                    Button {
+                        recenter(points.map(\.coordinate))
+                    } label: {
                         Image(systemName: isRouteRecenterActive ? "map.fill" : "map")
                     }
                 }

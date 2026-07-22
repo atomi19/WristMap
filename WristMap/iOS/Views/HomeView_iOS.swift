@@ -163,78 +163,88 @@ struct HomeView_iOS: View {
                 }
             }
             .sheet(item: $activeSheet) { sheet in
-                switch sheet {
-                case .routesLibrary:
-                    RoutesLibraryView(
-                        sessions: sessions,
-                        onRouteTap: { route in
-                            self.selectedRoute = route
-                            activeSheet = nil
-                        },
-                        onSessionTap: { session in
-                            selectedSession = session
-                            activeSheet = .sessionDetails
-                        }
-                    )
-                case .routeDetails:
-                    if let route = selectedRoute {
-                        RouteDetailsView(
-                            route: route,
-                            isRouteRecenterActive: $isRouteRecenterActive,
-                            selectedDetents: sheetDetent.routeDetails,
-                            points: points,
-                            onClose: {
-                                selectedRoute = nil
-                                activeSheet = nil
-                                points = []
-                            },
-                            onRouteRecenter: recenterOnRoute,
-                            onTrackingSelected: {
-                                activeSheet = .sessionRecord
-                            }
-                        )
-                        .bottomSheetStyle(selectedDetent: $sheetDetent.routeDetails)
-                    }
-                case .sessionRecord:
-                    SessionRecordView(
-                        tracker: tracker,
-                        selectedDetents: $sheetDetent.sessionRecord,
-                        activeSession: $selectedSession,
-                        isSessionRestored: $isSessionRestored,
-                    )
-                    .bottomSheetStyle(selectedDetent: $sheetDetent.sessionRecord)
-                case .sessionDetails:
-                    if let session = selectedSession {
-                        SessionDetailsView(
-                            session: session,
-                            selectedDetents: sheetDetent.sessionDetails,
-                            onClose: {
-                                activeSheet = nil
-                                sessionPoints.removeAll()
-                            }
-                        )
-                        .bottomSheetStyle(selectedDetent: $sheetDetent.sessionDetails)
-                    }
-                }
+                sheetView(sheet: sheet)
             }
         }
     }
     
-    private func recenterOnRoute() {
+    @ViewBuilder
+    private func sheetView(sheet: ActiveSheet) -> some View {
+        switch sheet {
+        case .routesLibrary:
+            RoutesLibraryView(
+                sessions: sessions,
+                onRouteTap: { route in
+                    self.selectedRoute = route
+                    activeSheet = nil
+                },
+                onSessionTap: { session in
+                    selectedSession = session
+                    activeSheet = .sessionDetails
+                }
+            )
+        case .routeDetails:
+            if let route = selectedRoute {
+                RouteDetailsView(
+                    route: route,
+                    isRouteRecenterActive: $isRouteRecenterActive,
+                    selectedDetents: sheetDetent.routeDetails,
+                    points: points,
+                    onClose: {
+                        selectedRoute = nil
+                        activeSheet = nil
+                        points = []
+                    },
+                    recenter: recenter,
+                )
+                .bottomSheetStyle(selectedDetent: $sheetDetent.routeDetails)
+            }
+        case .sessionRecord:
+            SessionRecordView(
+                tracker: tracker,
+                selectedDetents: $sheetDetent.sessionRecord,
+                activeSession: $selectedSession,
+                isSessionRestored: $isSessionRestored,
+            )
+            .bottomSheetStyle(selectedDetent: $sheetDetent.sessionRecord)
+        case .sessionDetails:
+            if let session = selectedSession {
+                SessionDetailsView(
+                    session: session,
+                    selectedDetents: sheetDetent.sessionDetails,
+                    isRouteRecenterActive: isRouteRecenterActive,
+                    onClose: {
+                        activeSheet = nil
+                        sessionPoints.removeAll()
+                    },
+                    recenter: recenter,
+                )
+                .bottomSheetStyle(selectedDetent: $sheetDetent.sessionDetails)
+            }
+        }
+    }
+    
+    private func recenter(coordinates: [CLLocationCoordinate2D]) {
         var rect = MKMapRect.null
         trackingMode = .none
         
-        for point in points {
+        for coordinate in coordinates {
             rect = rect.union(
                 MKMapRect(
-                    origin: MKMapPoint(point.coordinate),
+                    origin: MKMapPoint(coordinate),
                     size: MKMapSize(width: 1, height: 1)
                 )
             )
         }
         
+        // add padding from the screen edges when recenter on route
+        let paddingRect = rect.insetBy(
+            dx: -rect.size.width * 0.2,
+            dy: -rect.size.height * 0.2
+        )
+        
         withAnimation(.easeInOut) {
-            position = .rect(rect)
+            position = .rect(paddingRect)
         }
         
         isRouteRecenterActive = true
