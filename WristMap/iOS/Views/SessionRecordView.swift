@@ -105,7 +105,6 @@ struct SessionRecordView: View {
                 } label: {
                     Label("Finish", systemImage: "stop")
                 }
-                .disabled(tracker.locationHistory.count <= 1)
                 .buttonStyle(.bordered)
                 .tint(.red)
                 .controlSize(.large)

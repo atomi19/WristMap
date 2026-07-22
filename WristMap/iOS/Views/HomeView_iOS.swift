@@ -146,11 +146,19 @@ struct HomeView_iOS: View {
                         userTrackingMode: $trackingMode
                     )
                     Menu {
-                        Picker("Map Style", selection: $selectedMapStyle) {
+                        ControlGroup {
                             ForEach(SelectedMapStyle.allCases) { style in
-                                Text(style.rawValue).tag(style)
+                                Button {
+                                    selectedMapStyle = style
+                                } label: {
+                                    Label(
+                                        style.rawValue,
+                                        systemImage: style.systemImage
+                                    )
+                                }
                             }
                         }
+                        Divider()
                         Button("Routes", systemImage: "map") {
                             activeSheet = .routesLibrary
                         }

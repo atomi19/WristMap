@@ -20,4 +20,15 @@ enum SelectedMapStyle: String, CaseIterable, Identifiable {
         case .hybrid: return .hybrid
         }
     }
+        
+    var systemImage: String {
+        switch self {
+        case .standard:
+            return "map"
+        case .imagery:
+            return "globe"
+        case .hybrid:
+            return "square.2.layers.3d"
+        }
+    }
 }
