@@ -49,7 +49,7 @@ struct SessionRecordView: View {
                         systemImage: "arrowtriangle.right.circle.fill",
                         tint: .blue,
                         action: {
-                            tracker.resumeTracking()
+                            tracker.restoreTracking()
                             isSessionRestored = false
                         }
                     )

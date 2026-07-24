@@ -53,16 +53,7 @@ class LocationTracker: NSObject, ObservableObject, CLLocationManagerDelegate {
         trackerStatus = .active
         locationManager.requestWhenInUseAuthorization()
         
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-            guard let self, let start = self.locationHistory.first?.timestamp else {return}
-            
-            // set speed to 0 if last location update is > 5 sec
-            if let lastLocationUpdate, Date().timeIntervalSince(lastLocationUpdate) > 5 {
-                speed = 0
-            }
-            
-            duration = Date().timeIntervalSince(start)
-        }
+        setTimer()
     }
     
     func pauseTracking() {
@@ -73,6 +64,16 @@ class LocationTracker: NSObject, ObservableObject, CLLocationManagerDelegate {
     func resumeTracking() {
         locationManager.startUpdatingLocation()
         trackerStatus = .active
+    }
+    
+    func restoreTracking() {
+        guard locationHistory.count > 1 else { return }
+        locationManager.startUpdatingLocation()
+        trackerStatus = .active
+        
+        distance = calculateDistance(points: locationHistory)
+        setTimer()
+        averageSpeed = duration > 0 ? distance / duration : 0
     }
     
     func stopTracking() {
@@ -111,5 +112,39 @@ class LocationTracker: NSObject, ObservableObject, CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("Error while updating location \(error.localizedDescription)")
+    }
+    
+    private func calculateDistance(points: [CLLocation]) -> Double {
+        guard points.count > 1 else { return 0 }
+        
+        var total: Double = 0
+        
+        for i in 1..<points.count {
+            let start = CLLocation(
+                latitude: points[i - 1].coordinate.latitude,
+                longitude: points[i - 1].coordinate.longitude
+            )
+            
+            let end = CLLocation(
+                latitude: points[i].coordinate.latitude,
+                longitude: points[i].coordinate.longitude
+            )
+            
+            total += start.distance(from: end)
+        }
+        return total
+    }
+    
+    private func setTimer() {
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            guard let self, let start = self.locationHistory.first?.timestamp else {return}
+            
+            // set speed to 0 if last location update is > 5 sec
+            if let lastLocationUpdate, Date().timeIntervalSince(lastLocationUpdate) > 5 {
+                speed = 0
+            }
+            
+            duration = Date().timeIntervalSince(start)
+        }
     }
 }

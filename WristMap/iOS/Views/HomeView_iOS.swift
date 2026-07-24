@@ -116,6 +116,7 @@ struct HomeView_iOS: View {
             .onAppear {
                 locationManager.requestWhenInUseAuthorization()
                 
+                // restore last session if it is uncompleted
                 if let lastSession = sessions.first {
                     if lastSession.finishedAt == nil {
                         let sortedSession = lastSession.sessionPoints.sorted {$0.timestamp < $1.timestamp}

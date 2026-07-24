@@ -45,6 +45,7 @@ struct SaveSessionView: View {
                             
                             do {
                                 try context.save()
+                                tracker.stopTracking()
                                 tracker.locationHistory.removeAll()
                                 dismiss()
                             } catch {
