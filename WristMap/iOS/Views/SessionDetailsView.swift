@@ -73,7 +73,6 @@ struct SessionDetailsView: View {
                     } label: {
                         Image(systemName: isRouteRecenterActive ? "map.fill" : "map")
                     }
-                    .foregroundStyle(.secondary)
                 }
             }
             .navigationTitle(session.name)
