@@ -41,13 +41,7 @@ class LocationTracker: NSObject, ObservableObject, CLLocationManagerDelegate {
     
     func startTracking() {
         locationHistory.removeAll()
-        lastLocation = nil
-        lastLocationUpdate = nil
-        speed = 0
-        distance = 0
-        duration = 0
-        averageSpeed = 0
-        maxSpeed = 0
+        resetTracker()
         
         locationManager.startUpdatingLocation()
         trackerStatus = .active
@@ -146,5 +140,17 @@ class LocationTracker: NSObject, ObservableObject, CLLocationManagerDelegate {
             
             duration = Date().timeIntervalSince(start)
         }
+    }
+    
+    func resetTracker() {
+        speed = 0
+        distance = 0
+        duration = 0
+        averageSpeed = 0
+        maxSpeed = 0
+        
+        lastLocation = nil
+        timer?.invalidate()
+        lastLocationUpdate = nil
     }
 }

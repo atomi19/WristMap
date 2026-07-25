@@ -47,6 +47,7 @@ struct SaveSessionView: View {
                                 try context.save()
                                 tracker.stopTracking()
                                 tracker.locationHistory.removeAll()
+                                tracker.resetTracker()
                                 dismiss()
                             } catch {
                                 print(error)
@@ -57,6 +58,7 @@ struct SaveSessionView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Confirm", systemImage: "checkmark") {
                         saveSession(activeSession)
+                        tracker.resetTracker()
                     }
                     .disabled(
                         sessionName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
