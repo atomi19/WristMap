@@ -16,7 +16,7 @@ struct SessionRecordView: View {
     @Binding var isSessionRestored: Bool
     
     @State private var isShowingSaveSession: Bool = false
-        
+ 
     var body: some View {
         VStack {
             // header

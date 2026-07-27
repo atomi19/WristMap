@@ -13,6 +13,7 @@ import SwiftData
 enum ActiveSheet: Identifiable {
     var id: Self { self }
     
+    case settings
     case routesLibrary
     case routeDetails
     case sessionRecord
@@ -160,6 +161,9 @@ struct HomeView_iOS: View {
                             }
                         }
                         Divider()
+                        Button("Settings", systemImage: "gearshape") {
+                            activeSheet = .settings
+                        }
                         Button("Routes", systemImage: "map") {
                             activeSheet = .routesLibrary
                         }
@@ -184,6 +188,8 @@ struct HomeView_iOS: View {
     @ViewBuilder
     private func sheetView(sheet: ActiveSheet) -> some View {
         switch sheet {
+        case .settings:
+            SettingsView()
         case .routesLibrary:
             RoutesLibraryView(
                 sessions: sessions,

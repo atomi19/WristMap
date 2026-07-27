@@ -43,6 +43,9 @@
 		3A0193BE2FF6B54600BDBD6A /* Exceptions for "WristMap" folder in "WristMap Watch App" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				iOS/Logic/Settings.swift,
+				iOS/Models/MeasurementSystem.swift,
+				iOS/Models/SelectedMapStyle.swift,
 				iOS/Views/SessionDetailsView.swift,
 				Shared/Logic/GPXParser.swift,
 				Shared/Models/DataFormatter.swift,

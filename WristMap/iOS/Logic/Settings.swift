@@ -9,8 +9,10 @@ import MapKit
 enum Settings {
     private enum SettingsKeys {
         static let mapStyle = "mapStyle"
+        static let measurementSystem = "measurementSystem"
     }
     
+    // map style
     static var mapStyle: SelectedMapStyle {
         get {
             SelectedMapStyle(
@@ -19,6 +21,18 @@ enum Settings {
         }
         set {
             UserDefaults.standard.set(newValue.rawValue, forKey: SettingsKeys.mapStyle)
+        }
+    }
+    
+    // measurement system
+    static var measurementSystem: MeasurementSystem {
+        get {
+            MeasurementSystem(
+                rawValue: UserDefaults.standard.string(forKey: SettingsKeys.measurementSystem) ?? ""
+            ) ?? .system
+        }
+        set {
+            UserDefaults.standard.set(newValue.rawValue, forKey: SettingsKeys.measurementSystem)
         }
     }
 }
