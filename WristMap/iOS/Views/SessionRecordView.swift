@@ -42,18 +42,6 @@ struct SessionRecordView: View {
                         }
                     )
                 }
-                // continue session
-                if isSessionRestored {
-                    SessionActionButton(
-                        title: "Continue",
-                        systemImage: "arrowtriangle.right.circle.fill",
-                        tint: .blue,
-                        action: {
-                            tracker.restoreTracking()
-                            isSessionRestored = false
-                        }
-                    )
-                }
                 // pause tracking
                 if tracker.trackerStatus == .active || tracker.trackerStatus == .paused {
                     SessionActionButton(
@@ -107,6 +95,7 @@ struct SessionRecordView: View {
                 .buttonStyle(.bordered)
                 .tint(.red)
                 .controlSize(.large)
+                .disabled(activeSession == nil)
             }
         }
         .padding()
@@ -116,6 +105,9 @@ struct SessionRecordView: View {
                     tracker: tracker,
                     activeSession: session,
                     locationHistory: tracker.locationHistory,
+                    onSessionDiscarded: {
+                        activeSession = nil
+                    }
                 )
                 .presentationDetents([.medium])
             }
@@ -132,6 +124,12 @@ struct SessionRecordView: View {
                     )
                 }
                 activeSession.sessionPoints = points
+            }
+        }
+        .onAppear {
+            if isSessionRestored {
+                tracker.restoreTracking()
+                isSessionRestored = false
             }
         }
     }

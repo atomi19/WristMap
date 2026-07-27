@@ -18,6 +18,7 @@ struct SaveSessionView: View {
     
     var activeSession: Session
     var locationHistory: [CLLocation]
+    let onSessionDiscarded: () -> Void
     
     var body: some View {
         NavigationStack {
@@ -48,6 +49,7 @@ struct SaveSessionView: View {
                                 tracker.stopTracking()
                                 tracker.locationHistory.removeAll()
                                 tracker.resetTracker()
+                                onSessionDiscarded()
                                 dismiss()
                             } catch {
                                 print(error)
@@ -59,6 +61,7 @@ struct SaveSessionView: View {
                     Button("Confirm", systemImage: "checkmark") {
                         saveSession(activeSession)
                         tracker.resetTracker()
+                        onSessionDiscarded()
                     }
                     .disabled(
                         sessionName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
