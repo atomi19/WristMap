@@ -17,7 +17,6 @@ struct SaveSessionView: View {
     @State private var sessionName: String = ""
     
     var activeSession: Session
-    var locationHistory: [CLLocation]
     let onSessionDiscarded: () -> Void
     
     var body: some View {
@@ -47,7 +46,6 @@ struct SaveSessionView: View {
                             do {
                                 try context.save()
                                 tracker.stopTracking()
-                                tracker.locationHistory.removeAll()
                                 tracker.resetTracker()
                                 onSessionDiscarded()
                                 dismiss()
@@ -65,7 +63,7 @@ struct SaveSessionView: View {
                     }
                     .disabled(
                         sessionName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
-                        locationHistory.count <= 1
+                        tracker.locationHistory.count <= 1
                     )
                 }
             }
@@ -74,7 +72,7 @@ struct SaveSessionView: View {
     
     private func saveSession(_ activeSession: Session) {
         do {
-            let points = locationHistory.map {location in
+            let points = tracker.locationHistory.map {location in
                 SessionPoint(
                     latitude: location.coordinate.latitude,
                     longitude: location.coordinate.longitude,

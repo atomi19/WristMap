@@ -104,7 +104,6 @@ struct SessionRecordView: View {
                 SaveSessionView(
                     tracker: tracker,
                     activeSession: session,
-                    locationHistory: tracker.locationHistory,
                     onSessionDiscarded: {
                         activeSession = nil
                     }

@@ -143,6 +143,7 @@ class LocationTracker: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
     
     func resetTracker() {
+        locationHistory.removeAll()
         speed = 0
         distance = 0
         duration = 0

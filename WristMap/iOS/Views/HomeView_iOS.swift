@@ -80,27 +80,6 @@ struct HomeView_iOS: View {
                     print(error)
                 }
             }
-            .task(id: selectedSession?.uuid) {
-                guard let session = selectedSession else {
-                    sessionPoints = []
-                    return
-                }
-                
-                let sortedSession = session.sessionPoints.sorted { $0.timestamp < $1.timestamp }
-                
-                sessionPoints = sortedSession.map { point in
-                    CLLocation(
-                        coordinate: CLLocationCoordinate2D(
-                            latitude: point.latitude,
-                            longitude: point.longitude
-                        ),
-                        altitude: point.elevation,
-                        horizontalAccuracy: 0,
-                        verticalAccuracy: 0,
-                        timestamp: point.timestamp
-                    )
-                }
-            }
             .mapControls {
                 MapScaleView()
             }
@@ -198,6 +177,21 @@ struct HomeView_iOS: View {
                     activeSheet = nil
                 },
                 onSessionTap: { session in
+                    let sortedSession = session.sessionPoints.sorted { $0.timestamp < $1.timestamp }
+                    
+                    sessionPoints = sortedSession.map { point in
+                        CLLocation(
+                            coordinate: CLLocationCoordinate2D(
+                                latitude: point.latitude,
+                                longitude: point.longitude
+                            ),
+                            altitude: point.elevation,
+                            horizontalAccuracy: 0,
+                            verticalAccuracy: 0,
+                            timestamp: point.timestamp
+                        )
+                    }
+                    
                     selectedSession = session
                     activeSheet = .sessionDetails
                 }
