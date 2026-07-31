@@ -53,6 +53,14 @@ struct HomeView_iOS: View {
     
     // route distance markers (km)
     @State private var routeDistanceMarkers: [RouteDistanceMarker] = []
+    
+    // app theme
+    @AppStorage(Settings.Keys.appTheme)
+    private var appThemeRawValue = AppTheme.system.rawValue
+    
+    private var appTheme: AppTheme {
+        AppTheme(rawValue: appThemeRawValue) ?? .system
+    }
 
     var body: some View {
         NavigationStack {
@@ -140,6 +148,7 @@ struct HomeView_iOS: View {
             }
             .sheet(item: $activeSheet) { sheet in
                 sheetView(sheet: sheet)
+                    .preferredColorScheme(appTheme.colorScheme)
             }
         }
     }
@@ -364,7 +373,6 @@ extension View {
         self.modifier(BottomSheetView(selectedDetent: selectedDetent))
     }
 }
-
 
 #Preview {
     HomeView_iOS()

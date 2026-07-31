@@ -44,6 +44,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				iOS/Logic/Settings.swift,
+				iOS/Models/AppTheme.swift,
 				iOS/Models/MeasurementSystem.swift,
 				iOS/Models/SelectedMapStyle.swift,
 				iOS/Views/SessionDetailsView.swift,
