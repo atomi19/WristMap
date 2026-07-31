@@ -1,5 +1,5 @@
 //
-//  RoutesLibraryView.swift
+//  LibraryView.swift
 //  WristMap
 //
 
@@ -11,7 +11,7 @@ private enum LibraryTabs: Int {
     case sessions
 }
 
-struct RoutesLibraryView: View {
+struct LibraryView: View {
     @Environment(\.modelContext) private var context
     let watchManager = WatchConnectivityManager()
     

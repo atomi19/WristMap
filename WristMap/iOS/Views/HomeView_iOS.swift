@@ -14,7 +14,7 @@ enum ActiveSheet: Identifiable {
     var id: Self { self }
     
     case settings
-    case routesLibrary
+    case library
     case routeDetails
     case sessionRecord
     case sessionDetails
@@ -158,8 +158,8 @@ struct HomeView_iOS: View {
         switch sheet {
         case .settings:
             SettingsView()
-        case .routesLibrary:
-            RoutesLibraryView(
+        case .library:
+            LibraryView(
                 sessions: sessions,
                 onRouteTap: { route in
                     self.selectedRoute = route
@@ -347,8 +347,8 @@ private struct MoreMenuView: View {
             Button("Settings", systemImage: "gearshape") {
                 activeSheet = .settings
             }
-            Button("Routes", systemImage: "map") {
-                activeSheet = .routesLibrary
+            Button("Library", systemImage: "map") {
+                activeSheet = .library
             }
             Button("Session", systemImage: "location.viewfinder") {
                 activeSheet = nil
