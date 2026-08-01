@@ -16,6 +16,7 @@ struct SaveSessionView: View {
     @State private var isShowingSessionDiscard: Bool = false
     @State private var sessionName: String = ""
     
+    @Binding var isSessionActive: Bool
     var activeSession: Session
     let onSessionDiscarded: () -> Void
     
@@ -48,6 +49,7 @@ struct SaveSessionView: View {
                                 tracker.stopTracking()
                                 tracker.resetTracker()
                                 onSessionDiscarded()
+                                isSessionActive = false
                                 dismiss()
                             } catch {
                                 print(error)
@@ -60,6 +62,7 @@ struct SaveSessionView: View {
                         saveSession(activeSession)
                         tracker.resetTracker()
                         onSessionDiscarded()
+                        isSessionActive = false
                     }
                     .disabled(
                         sessionName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||

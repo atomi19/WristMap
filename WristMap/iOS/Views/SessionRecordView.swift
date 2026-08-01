@@ -14,6 +14,7 @@ struct SessionRecordView: View {
     @Binding var selectedDetents: PresentationDetent
     @Binding var activeSession: Session?
     @Binding var isSessionRestored: Bool
+    @Binding var isSessionActive: Bool
     
     @State private var isShowingSaveSession: Bool = false
  
@@ -39,6 +40,7 @@ struct SessionRecordView: View {
                         action: {
                             tracker.startTracking()
                             createSession()
+                            isSessionActive = true
                         }
                     )
                 }
@@ -103,6 +105,7 @@ struct SessionRecordView: View {
             if let session = activeSession {
                 SaveSessionView(
                     tracker: tracker,
+                    isSessionActive: $isSessionActive,
                     activeSession: session,
                     onSessionDiscarded: {
                         activeSession = nil
@@ -129,6 +132,7 @@ struct SessionRecordView: View {
             if isSessionRestored {
                 tracker.restoreTracking()
                 isSessionRestored = false
+                isSessionActive = true
             }
         }
         .bottomSheetStyle(selectedDetent: $selectedDetents)

@@ -42,6 +42,8 @@ struct HomeView_iOS: View {
     @State private var routeDetailsDetent: PresentationDetent = SheetDetent.compact
     @State private var sessionRecordDetent: PresentationDetent = SheetDetent.compact
     @State private var sessionDetailsDetent: PresentationDetent = SheetDetent.compact
+    // if session recording is active, open it back
+    @State private var shouldOpenSessionRecordBack: Bool = false
     
     // sessions
     @Query(sort: \Session.startedAt, order: .reverse)
@@ -145,7 +147,16 @@ struct HomeView_iOS: View {
                 }
                 .padding()
             }
-            .sheet(item: $activeSheet) { sheet in
+            .sheet(
+                item: $activeSheet,
+                onDismiss: {
+                    if activeSheet == nil {
+                        if shouldOpenSessionRecordBack {
+                            activeSheet = .sessionRecord
+                        }
+                    }
+                }
+            ) { sheet in
                 sheetView(sheet: sheet)
                     .preferredColorScheme(appTheme.colorScheme)
             }
@@ -205,6 +216,7 @@ struct HomeView_iOS: View {
                 selectedDetents: $sessionRecordDetent,
                 activeSession: $selectedSession,
                 isSessionRestored: $isSessionRestored,
+                isSessionActive: $shouldOpenSessionRecordBack
             )
         case .sessionDetails:
             if let session = selectedSession {
