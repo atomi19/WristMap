@@ -11,7 +11,7 @@ struct SessionRecordView: View {
     @Environment(\.modelContext) private var context
     
     @ObservedObject var tracker: LocationTracker
-    var selectedDetents: PresentationDetent
+    @Binding var selectedDetents: PresentationDetent
     @Binding var activeSession: Session?
     @Binding var isSessionRestored: Bool
     
@@ -59,7 +59,7 @@ struct SessionRecordView: View {
                 }
             }
             // body
-            if selectedDetents != .height(75) {
+            if selectedDetents != SheetDetent.compact {
                 Divider()
                 HStack {
                     VStack(alignment: .leading, spacing: 16) {
@@ -131,6 +131,7 @@ struct SessionRecordView: View {
                 isSessionRestored = false
             }
         }
+        .bottomSheetStyle(selectedDetent: $selectedDetents)
     }
     
     // create empty session 

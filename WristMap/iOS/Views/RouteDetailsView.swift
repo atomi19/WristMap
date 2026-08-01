@@ -10,7 +10,8 @@ import CoreLocation
 struct RouteDetailsView: View {
     let route: Route
     @Binding var isRouteRecenterActive: Bool
-    let selectedDetents: PresentationDetent
+    @Binding var selectedDetents: PresentationDetent
+//    let selectedDetents: PresentationDetent
     let points: [GPXPoint]
     let onClose: () -> Void
     let recenter: ([CLLocationCoordinate2D]) -> Void
@@ -56,7 +57,7 @@ struct RouteDetailsView: View {
         NavigationStack {
             VStack {
                 // show chart only if sheet is expanded
-                if selectedDetents != .height(75) {
+                if selectedDetents != SheetDetent.compact {
                     Chart(elevationPoints) { point in
                         LineMark(
                             x: .value("Distance", point.distance),
@@ -93,6 +94,7 @@ struct RouteDetailsView: View {
                 }
             }
         }
+        .bottomSheetStyle(selectedDetent: $selectedDetents)
     }
     
     // optimize elevation points to max 200

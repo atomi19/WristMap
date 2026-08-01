@@ -20,12 +20,6 @@ enum ActiveSheet: Identifiable {
     case sessionDetails
 }
 
-struct SheetDetent {
-    var routeDetails: PresentationDetent = .height(75)
-    var sessionRecord: PresentationDetent = .height(75)
-    var sessionDetails: PresentationDetent = .height(75)
-}
-
 struct HomeView_iOS: View {
     @StateObject private var tracker = LocationTracker()
     
@@ -42,9 +36,14 @@ struct HomeView_iOS: View {
     
     @State private var isRouteRecenterActive: Bool = false
     
+    // sheets
     @State private var activeSheet: ActiveSheet?
-    @State private var sheetDetent = SheetDetent()
     
+    @State private var routeDetailsDetent: PresentationDetent = SheetDetent.compact
+    @State private var sessionRecordDetent: PresentationDetent = SheetDetent.compact
+    @State private var sessionDetailsDetent: PresentationDetent = SheetDetent.compact
+    
+    // sessions
     @Query(sort: \Session.startedAt, order: .reverse)
     private var sessions: [Session]
     
@@ -190,7 +189,7 @@ struct HomeView_iOS: View {
                 RouteDetailsView(
                     route: route,
                     isRouteRecenterActive: $isRouteRecenterActive,
-                    selectedDetents: sheetDetent.routeDetails,
+                    selectedDetents: $routeDetailsDetent,
                     points: points,
                     onClose: {
                         selectedRoute = nil
@@ -199,21 +198,19 @@ struct HomeView_iOS: View {
                     },
                     recenter: recenter,
                 )
-                .bottomSheetStyle(selectedDetent: $sheetDetent.routeDetails)
             }
         case .sessionRecord:
             SessionRecordView(
                 tracker: tracker,
-                selectedDetents: sheetDetent.sessionRecord,
+                selectedDetents: $sessionRecordDetent,
                 activeSession: $selectedSession,
                 isSessionRestored: $isSessionRestored,
             )
-            .bottomSheetStyle(selectedDetent: $sheetDetent.sessionRecord)
         case .sessionDetails:
             if let session = selectedSession {
                 SessionDetailsView(
+                    selectedDetents: $sessionDetailsDetent,
                     session: session,
-                    selectedDetents: sheetDetent.sessionDetails,
                     isRouteRecenterActive: isRouteRecenterActive,
                     onClose: {
                         activeSheet = nil
@@ -221,7 +218,6 @@ struct HomeView_iOS: View {
                     },
                     recenter: recenter,
                 )
-                .bottomSheetStyle(selectedDetent: $sheetDetent.sessionDetails)
             }
         }
     }
@@ -308,23 +304,7 @@ struct HomeView_iOS: View {
     }
 }
 
-private struct BottomSheetView: ViewModifier {
-    @Binding var selectedDetent: PresentationDetent
-    
-    func body(content: Content) -> some View {
-        content
-            .presentationDetents(
-                [
-                    .height(75),
-                    .height(250)
-                ],
-                selection: $selectedDetent
-            )
-            .presentationBackgroundInteraction(.enabled(upThrough: .height(250)))
-            .interactiveDismissDisabled()
-    }
-}
-
+// more menu on the home page
 private struct MoreMenuView: View {
     @Binding var selectedMapStyle: SelectedMapStyle
     @Binding var activeSheet: ActiveSheet?
@@ -366,11 +346,35 @@ private struct MoreMenuView: View {
     }
 }
 
+private struct BottomSheetView: ViewModifier {
+    @Binding var selectedDetent: PresentationDetent
+    
+    func body(content: Content) -> some View {
+        content
+            .presentationDetents(
+                [
+                    SheetDetent.compact,
+                    SheetDetent.medium
+                ],
+                selection: $selectedDetent
+            )
+            .presentationBackgroundInteraction(
+                .enabled(upThrough: SheetDetent.medium)
+            )
+            .interactiveDismissDisabled()
+    }
+}
+
+// reusing BottomSheetView for sheets
 extension View {
     func bottomSheetStyle(
         selectedDetent: Binding<PresentationDetent>
     ) -> some View {
-        self.modifier(BottomSheetView(selectedDetent: selectedDetent))
+        self.modifier(
+            BottomSheetView(
+                selectedDetent: selectedDetent
+            )
+        )
     }
 }
 

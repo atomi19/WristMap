@@ -8,8 +8,9 @@ import MapKit
 
 struct SessionDetailsView: View {
     @Environment(\.dismiss) private var dismiss
+    
+    @Binding var selectedDetents: PresentationDetent
     var session: Session
-    let selectedDetents: PresentationDetent
     let isRouteRecenterActive: Bool
     let onClose: () -> Void
     let recenter: ([CLLocationCoordinate2D]) -> Void
@@ -17,7 +18,7 @@ struct SessionDetailsView: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading) {
-                if selectedDetents != .height(75) {
+                if selectedDetents != SheetDetent.compact {
                     HStack {
                         VStack(alignment: .leading) {
                             SessionDetailsTextView(
@@ -78,5 +79,6 @@ struct SessionDetailsView: View {
             .navigationTitle(session.name)
             .navigationBarTitleDisplayMode(.inline)
         }
+        .bottomSheetStyle(selectedDetent: $selectedDetents)
     }
 }

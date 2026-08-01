@@ -47,7 +47,7 @@
 				iOS/Models/AppTheme.swift,
 				iOS/Models/MeasurementSystem.swift,
 				iOS/Models/SelectedMapStyle.swift,
-				iOS/Views/SessionDetailsView.swift,
+				iOS/Models/SheetDetent.swift,
 				Shared/Logic/GPXParser.swift,
 				Shared/Models/DataFormatter.swift,
 				Shared/Models/GPXFileManager.swift,
