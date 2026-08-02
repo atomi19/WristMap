@@ -60,12 +60,6 @@ struct HomeMapView: View {
     }
 }
 
-struct RouteDistanceMarker: Identifiable {
-    let id = UUID()
-    let distance: Double // distance in km
-    let coordinate: CLLocationCoordinate2D
-}
-
 // km annotations on route
 private struct RouteDistanceMarkerView: View {
     let textLabel: String

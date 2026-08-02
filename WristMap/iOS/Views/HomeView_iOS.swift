@@ -22,13 +22,7 @@ enum ActiveSheet: Identifiable {
 
 struct HomeView_iOS: View {
     @StateObject private var tracker = LocationTracker()
-    
-    @State private var selectedRoute: Route? = nil
-    @State private var points: [GPXPoint] = []
-    
-    @State private var selectedSession: Session? = nil
-    @State private var sessionPoints: [CLLocation] = []
-    @State private var isSessionRestored: Bool = false
+    @State private var viewModel = HomeViewModel()
     
     @State private var locationManager = CLLocationManager()
     @State private var trackingMode: UserTrackingModes = .follow
@@ -52,9 +46,6 @@ struct HomeView_iOS: View {
     // settings
     @State private var selectedMapStyle: SelectedMapStyle = Settings.mapStyle
     
-    // route distance markers (km)
-    @State private var routeDistanceMarkers: [RouteDistanceMarker] = []
-    
     // app theme
     @AppStorage(Settings.Keys.appTheme)
     private var appThemeRawValue = AppTheme.system.rawValue
@@ -68,24 +59,22 @@ struct HomeView_iOS: View {
             HomeMapView(
                 tracker: tracker,
                 position: $position,
-                points: points,
-                sessionPoints: sessionPoints,
+                points: viewModel.points,
+                sessionPoints: viewModel.sessionPoints,
                 trackingPoints: tracker.locationHistory,
-                routeDistanceMarkers: routeDistanceMarkers
+                routeDistanceMarkers: viewModel.routeDistanceMarkers
             )
-            .task(id: selectedRoute?.uuid) {
-                guard let route = selectedRoute else {
-                    points = []
+            .task(id: viewModel.selectedRoute?.uuid) {
+                guard let route = viewModel.selectedRoute else {
+                    viewModel.points = []
                     return
                 }
                 
                 do {
-                    let url = GPXFileManager.fileURL(for: route.uuid)
-                    points = try GPXParser().parse(url: url)
-                    calculateDistanceMarkers(route: route)
+                    try viewModel.loadRoute(route)
                     activeSheet = .routeDetails
                 } catch {
-                    points = []
+                    viewModel.points = []
                     print(error)
                 }
             }
@@ -105,28 +94,10 @@ struct HomeView_iOS: View {
             .onAppear {
                 locationManager.requestWhenInUseAuthorization()
                 
-                // restore last session if it is uncompleted
-                if let lastSession = sessions.first {
-                    if lastSession.finishedAt == nil {
-                        let sortedSession = lastSession.sessionPoints.sorted {$0.timestamp < $1.timestamp}
-                        sessionPoints = sortedSession.map { point in
-                            CLLocation(
-                                coordinate: CLLocationCoordinate2D(
-                                    latitude: point.latitude,
-                                    longitude: point.longitude
-                                ),
-                                altitude: point.elevation,
-                                horizontalAccuracy: 0,
-                                verticalAccuracy: 0,
-                                timestamp: point.timestamp
-                            )
-                        }
-                        tracker.locationHistory = sessionPoints
-                        
-                        selectedSession = lastSession
-                        activeSheet = .sessionRecord
-                        isSessionRestored = true
-                    }
+                // restore last session if it is uncompleted (finishedAt == nil)
+                if viewModel.restoreActiveSession(from: sessions) {
+                    tracker.locationHistory = viewModel.sessionPoints
+                    activeSheet = .sessionRecord
                 }
             }
             .overlay(alignment: .topTrailing) {
@@ -172,40 +143,24 @@ struct HomeView_iOS: View {
             LibraryView(
                 sessions: sessions,
                 onRouteTap: { route in
-                    self.selectedRoute = route
+                    viewModel.selectedRoute = route
                     activeSheet = nil
                 },
                 onSessionTap: { session in
-                    let sortedSession = session.sessionPoints.sorted { $0.timestamp < $1.timestamp }
-                    
-                    sessionPoints = sortedSession.map { point in
-                        CLLocation(
-                            coordinate: CLLocationCoordinate2D(
-                                latitude: point.latitude,
-                                longitude: point.longitude
-                            ),
-                            altitude: point.elevation,
-                            horizontalAccuracy: 0,
-                            verticalAccuracy: 0,
-                            timestamp: point.timestamp
-                        )
-                    }
-                    
-                    selectedSession = session
+                    viewModel.select(session: session)
                     activeSheet = .sessionDetails
                 }
             )
         case .routeDetails:
-            if let route = selectedRoute {
+            if let route = viewModel.selectedRoute {
                 RouteDetailsView(
                     route: route,
                     isRouteRecenterActive: $isRouteRecenterActive,
                     selectedDetents: $routeDetailsDetent,
-                    points: points,
+                    points: viewModel.points,
                     onClose: {
-                        selectedRoute = nil
+                        viewModel.clearRoute()
                         activeSheet = nil
-                        points = []
                     },
                     recenter: recenter,
                 )
@@ -214,19 +169,19 @@ struct HomeView_iOS: View {
             SessionRecordView(
                 tracker: tracker,
                 selectedDetents: $sessionRecordDetent,
-                activeSession: $selectedSession,
-                isSessionRestored: $isSessionRestored,
+                activeSession: $viewModel.selectedSession,
+                isSessionRestored: $viewModel.isSessionRestored,
                 isSessionActive: $shouldOpenSessionRecordBack
             )
         case .sessionDetails:
-            if let session = selectedSession {
+            if let session = viewModel.selectedSession {
                 SessionDetailsView(
                     selectedDetents: $sessionDetailsDetent,
                     session: session,
                     isRouteRecenterActive: isRouteRecenterActive,
                     onClose: {
                         activeSheet = nil
-                        sessionPoints.removeAll()
+                        viewModel.sessionPoints.removeAll()
                     },
                     recenter: recenter,
                 )
@@ -258,135 +213,6 @@ struct HomeView_iOS: View {
         }
         
         isRouteRecenterActive = true
-    }
-    
-    // calculate coordinates for distance markers on route
-    private func calculateDistanceMarkers(route: Route) {
-        let totalDistance = route.distance / 1000
-        
-        let targetMarkers = 10.0
-        let rawInterval = totalDistance / targetMarkers
-        
-        let niceIntervals: [Double] = [
-            1, 2, 5, 10, 20, 25, 50, 100
-        ]
-        
-        let interval = niceIntervals.first(where: { $0 >= rawInterval }) ?? 100
-        
-        // count from interval by interval to total route distance
-        let markerDistances = Array(
-            stride(
-                from: interval,
-                to: totalDistance,
-                by: interval
-            )
-        )
-        
-        var markerIndex = 0
-        var distance: Double = 0
-        routeDistanceMarkers.removeAll()
-        
-        // go through GPX points
-        // and add distance marker if a target distance is reached
-        for i in 1..<points.count {
-            let start = CLLocation(
-                latitude: points[i - 1].coordinate.latitude,
-                longitude: points[i - 1].coordinate.longitude
-            )
-            
-            let end = CLLocation(
-                latitude: points[i].coordinate.latitude,
-                longitude: points[i].coordinate.longitude
-            )
-            
-            distance += start.distance(from: end)
-            
-            while markerIndex < markerDistances.count &&
-                    distance >= markerDistances[markerIndex] * 1000 {
-                routeDistanceMarkers.append(
-                    RouteDistanceMarker(
-                        distance: markerDistances[markerIndex],
-                        coordinate: points[i].coordinate
-                    )
-                )
-                
-                markerIndex += 1
-            }
-        }
-    }
-}
-
-// more menu on the home page
-private struct MoreMenuView: View {
-    @Binding var selectedMapStyle: SelectedMapStyle
-    @Binding var activeSheet: ActiveSheet?
-    
-    var body: some View {
-        Menu {
-            ControlGroup {
-                ForEach(SelectedMapStyle.allCases) { style in
-                    Button {
-                        selectedMapStyle = style
-                    } label: {
-                        Label(
-                            style.rawValue,
-                            systemImage: style.systemImage
-                        )
-                    }
-                }
-            }
-            Divider()
-            Button("Settings", systemImage: "gearshape") {
-                activeSheet = .settings
-            }
-            Button("Library", systemImage: "map") {
-                activeSheet = .library
-            }
-            Button("Session", systemImage: "location.viewfinder") {
-                activeSheet = nil
-                
-                DispatchQueue.main.async {
-                    activeSheet = .sessionRecord
-                }
-            }
-        } label: {
-            Image(systemName: "line.3.horizontal")
-                .frame(width: 44, height: 44)
-                .background(.ultraThinMaterial, in: Circle())
-        }
-        .foregroundStyle(.primary)
-    }
-}
-
-private struct BottomSheetView: ViewModifier {
-    @Binding var selectedDetent: PresentationDetent
-    
-    func body(content: Content) -> some View {
-        content
-            .presentationDetents(
-                [
-                    SheetDetent.compact,
-                    SheetDetent.medium
-                ],
-                selection: $selectedDetent
-            )
-            .presentationBackgroundInteraction(
-                .enabled(upThrough: SheetDetent.medium)
-            )
-            .interactiveDismissDisabled()
-    }
-}
-
-// reusing BottomSheetView for sheets
-extension View {
-    func bottomSheetStyle(
-        selectedDetent: Binding<PresentationDetent>
-    ) -> some View {
-        self.modifier(
-            BottomSheetView(
-                selectedDetent: selectedDetent
-            )
-        )
     }
 }
 

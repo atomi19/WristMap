@@ -45,7 +45,10 @@
 			membershipExceptions = (
 				iOS/Logic/Settings.swift,
 				iOS/Models/AppTheme.swift,
+				iOS/Models/HomeViewModel.swift,
 				iOS/Models/MeasurementSystem.swift,
+				iOS/Models/RouteDistanceMarker.swift,
+				iOS/Models/RouteDistanceMarkerCalculator.swift,
 				iOS/Models/SelectedMapStyle.swift,
 				iOS/Models/SheetDetent.swift,
 				Shared/Logic/GPXParser.swift,
