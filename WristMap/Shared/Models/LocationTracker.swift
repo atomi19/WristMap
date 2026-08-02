@@ -68,6 +68,7 @@ class LocationTracker: NSObject, ObservableObject, CLLocationManagerDelegate {
         distance = calculateDistance(points: locationHistory)
         setTimer()
         averageSpeed = duration > 0 ? distance / duration : 0
+        maxSpeed = locationHistory.map(\.speed).max() ?? 0
     }
     
     func stopTracking() {

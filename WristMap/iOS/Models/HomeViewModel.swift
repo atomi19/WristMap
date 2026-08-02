@@ -29,7 +29,7 @@ final class HomeViewModel {
         )
     }
     
-    // restore unfinished session after reopening app 
+    // restore unfinished session after reopening app
     func restoreActiveSession(from sessions: [Session]) -> Bool {
         guard let lastSession = sessions.first, lastSession.finishedAt == nil else {
             return false
@@ -65,6 +65,8 @@ final class HomeViewModel {
                     altitude: point.elevation,
                     horizontalAccuracy: 0,
                     verticalAccuracy: 0,
+                    course: 0,
+                    speed: point.speed,
                     timestamp: point.timestamp
                 )
             }
