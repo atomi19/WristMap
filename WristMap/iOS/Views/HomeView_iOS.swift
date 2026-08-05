@@ -62,7 +62,10 @@ struct HomeView_iOS: View {
                 points: viewModel.points,
                 sessionPoints: viewModel.sessionPoints,
                 trackingPoints: tracker.locationHistory,
-                routeDistanceMarkers: viewModel.routeDistanceMarkers
+                routeDistanceMarkers: viewModel.routeDistanceMarkers,
+                selectedMapStyle: $selectedMapStyle,
+                activeSheet: $activeSheet,
+                trackingMode: $trackingMode
             )
             .task(id: viewModel.selectedRoute?.uuid) {
                 guard let route = viewModel.selectedRoute else {
@@ -78,10 +81,6 @@ struct HomeView_iOS: View {
                     print(error)
                 }
             }
-            .mapControls {
-                MapScaleView()
-            }
-            .mapStyle(selectedMapStyle.mapStyle)
             .onChange(of: selectedMapStyle) {
                 Settings.mapStyle = selectedMapStyle
             }
@@ -99,24 +98,6 @@ struct HomeView_iOS: View {
                     tracker.locationHistory = viewModel.sessionPoints
                     activeSheet = .sessionRecord
                 }
-            }
-            .overlay(alignment: .topTrailing) {
-                VStack(spacing: 12) {
-                    // menu
-                    MoreMenuView(
-                        selectedMapStyle: $selectedMapStyle,
-                        activeSheet: $activeSheet
-                    )
-                    // user location
-                    CustomUserLocationButton(
-                        position: $position,
-                        userTrackingMode: $trackingMode
-                    )
-                    .foregroundStyle(.primary)
-                    .frame(width: 44, height: 44)
-                    .background(.ultraThinMaterial, in: Circle())
-                }
-                .padding()
             }
             .sheet(
                 item: $activeSheet,

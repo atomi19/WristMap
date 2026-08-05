@@ -15,6 +15,12 @@ struct HomeMapView: View {
     let trackingPoints: [CLLocation]
     let routeDistanceMarkers: [RouteDistanceMarker]
     
+    @Binding var selectedMapStyle: SelectedMapStyle
+    @Binding var activeSheet: ActiveSheet?
+    @Binding var trackingMode: UserTrackingModes
+    
+    @State private var currentCamera: MapCamera?
+    
     var body: some View {
         Map(position: $position) {
             // user location
@@ -56,6 +62,47 @@ struct HomeMapView: View {
                 MapPolyline(coordinates: sessionPoints.map { $0.coordinate })
                     .stroke(.green, lineWidth: 4)
             }
+        }
+        .mapControls {
+            MapScaleView()
+        }
+        .mapStyle(selectedMapStyle.mapStyle)
+        .onMapCameraChange(frequency: .continuous) { context in
+            currentCamera = context.camera
+        }
+        .overlay(alignment: .topTrailing) {
+            VStack(spacing: 12) {
+                // menu
+                MoreMenuView(
+                    selectedMapStyle: $selectedMapStyle,
+                    activeSheet: $activeSheet
+                )
+                // user location
+                CustomUserLocationButton(
+                    position: $position,
+                    userTrackingMode: $trackingMode
+                )
+                .foregroundStyle(.primary)
+                .frame(width: 44, height: 44)
+                .background(.ultraThinMaterial, in: Circle())
+                if let currentCamera, currentCamera.heading != 0 {
+                    CustomCompassButton(
+                        heading: currentCamera.heading,
+                        resetHeading: {
+                            var camera = currentCamera
+                            camera.heading = 0
+                            
+                            withAnimation(.easeInOut) {
+                                position = .camera(camera)
+                            }
+                        }
+                    )
+                    .foregroundStyle(.primary)
+                    .frame(width: 44, height: 44)
+                    .background(.ultraThinMaterial, in: Circle())
+                }
+            }
+            .padding()
         }
     }
 }

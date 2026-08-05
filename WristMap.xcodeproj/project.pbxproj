@@ -59,6 +59,7 @@
 				Shared/Models/Route.swift,
 				Shared/Models/Session.swift,
 				Shared/Models/SessionPoint.swift,
+				Shared/Views/CustomCompassButton.swift,
 				Shared/Views/CustomUserLocationButton.swift,
 				Shared/Views/SessionDetailsTextView.swift,
 				Shared/WatchConnectivity/WatchConnectivityManager.swift,
