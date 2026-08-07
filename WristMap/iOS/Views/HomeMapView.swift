@@ -39,7 +39,7 @@ struct HomeMapView: View {
                 // distance annotations
                 if !routeDistanceMarkers.isEmpty {
                     ForEach(routeDistanceMarkers) { distanceMarker in
-                        let formattedDistance = String(format: "%.0f km", distanceMarker.distance)
+                        let formattedDistance = DataFormatter.distance(distanceMarker.distance)
                         Annotation("", coordinate: distanceMarker.coordinate) {
                             RouteDistanceMarkerView(textLabel: formattedDistance)
                         }
@@ -107,7 +107,7 @@ struct HomeMapView: View {
     }
 }
 
-// km annotations on route
+// distance annotations on route
 private struct RouteDistanceMarkerView: View {
     let textLabel: String
     

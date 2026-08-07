@@ -7,6 +7,6 @@ import CoreLocation
 
 struct RouteDistanceMarker: Identifiable {
     let id = UUID()
-    let distance: Double // distance in km
+    let distance: Double // distance in meters
     let coordinate: CLLocationCoordinate2D
 }

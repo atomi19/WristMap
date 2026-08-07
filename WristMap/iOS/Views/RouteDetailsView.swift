@@ -11,7 +11,6 @@ struct RouteDetailsView: View {
     let route: Route
     @Binding var isRouteRecenterActive: Bool
     @Binding var selectedDetents: PresentationDetent
-//    let selectedDetents: PresentationDetent
     let points: [GPXPoint]
     let onClose: () -> Void
     let recenter: ([CLLocationCoordinate2D]) -> Void
@@ -42,7 +41,7 @@ struct RouteDetailsView: View {
             
             allPoints.append(
                 ElevationPoint(
-                    distance: distance / 1000,
+                    distance: distance, // distance in meters
                     elevation: elevation
                 )
             )
@@ -66,6 +65,30 @@ struct RouteDetailsView: View {
                     }
                     // limit x by start and end of route (so there is no padding inside the chart)
                     .chartXScale(domain: elevationPoints.first!.distance...elevationPoints.last!.distance)
+                    .chartXAxis {
+                        AxisMarks { value in
+                            AxisGridLine()
+                            AxisTick()
+                            
+                            AxisValueLabel {
+                                if let distance = value.as(Double.self) {
+                                    Text(DataFormatter.shortDistance(distance))
+                                }
+                            }
+                        }
+                    }
+                    .chartYAxis {
+                        AxisMarks(position: .leading) { value in
+                            AxisGridLine()
+                            AxisTick()
+                            
+                            AxisValueLabel {
+                                if let elevation = value.as(Double.self) {
+                                    Text(DataFormatter.shortDistance(elevation))
+                                }
+                            }
+                        }
+                    }
                     .frame(height: 150)
                     .padding()
                 }
@@ -132,6 +155,6 @@ struct RouteDetailsView: View {
 
 struct ElevationPoint: Identifiable {
     var id = UUID()
-    var distance: Double // in km
+    var distance: Double // in meters
     var elevation: Double // in meters
 }

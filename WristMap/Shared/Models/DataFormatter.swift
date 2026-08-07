@@ -35,6 +35,27 @@ enum DataFormatter {
         return formatter.string(from: converted)
     }
     
+    static func shortDistance(_ meters: Double) -> String {
+        let formatter = MeasurementFormatter()
+        formatter.unitOptions = .providedUnit
+        formatter.unitStyle = .short
+        formatter.numberFormatter.maximumFractionDigits = 0
+        
+        let measurement: Measurement<UnitLength>
+        
+        if measurementPreference.usesMetric {
+            measurement = meters < 1000
+            ? Measurement(value: meters, unit: UnitLength.meters)
+            : Measurement(value: meters / 1000, unit: .kilometers)
+        } else {
+            measurement = meters < 1609.34
+            ? Measurement(value: meters, unit: .feet)
+            : Measurement(value: meters / 1609.34, unit: .miles)
+        }
+        
+        return formatter.string(from: measurement)
+    }
+    
     static func duration(_ duration: Double) -> String {
         Duration.seconds(duration).formatted()
     }

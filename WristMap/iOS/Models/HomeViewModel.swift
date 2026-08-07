@@ -10,7 +10,7 @@ import CoreLocation
 final class HomeViewModel {
     var selectedRoute: Route? = nil
     var points: [GPXPoint] = []
-    // route distance markers (km)
+    // route distance markers in meters
     var routeDistanceMarkers: [RouteDistanceMarker] = []
     
     var selectedSession: Session? = nil
