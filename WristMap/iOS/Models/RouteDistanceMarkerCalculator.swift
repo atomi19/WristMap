@@ -10,7 +10,6 @@ enum RouteDistanceMarkerCalculator {
         guard points.count > 1 else { return [] }
         
         let totalDistance = route.distance // distance in meters
-        print(totalDistance)
         
         let targetMarkers = 10.0
         let rawInterval = totalDistance / targetMarkers
