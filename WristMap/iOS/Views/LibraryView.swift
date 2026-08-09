@@ -56,12 +56,14 @@ struct RoutesListView: View {
     @Environment(\.modelContext) private var context
     @State private var isShowingAddRoute = false
     @State private var isShowingEditRoute = false
+    @State private var isShowingRouteDeleteConfirm = false
     
     let watchManager: WatchConnectivityManager
     var routes: [Route]
     let onRouteTap: (Route) -> Void
 
     @State private var routeToEdit: Route?
+    @State private var routeToDelete: Route?
     
     var body: some View {
         List {
@@ -86,9 +88,11 @@ struct RoutesListView: View {
                     .tint(.blue)
                 }
                 .swipeActions(edge: .trailing) {
-                    Button("Delete", systemImage: "trash", role: .destructive) {
-                        deleteRoute(route)
+                    Button("Delete", systemImage: "trash") {
+                        routeToDelete = route
+                        isShowingRouteDeleteConfirm = true
                     }
+                    .tint(.red)
                     Button("Edit", systemImage: "pencil") {
                         routeToEdit = route
                     }
@@ -130,6 +134,19 @@ struct RoutesListView: View {
             EditRouteView(route: route)
                 .presentationDetents([.medium])
         }
+        .alert("Delete Route?", isPresented: $isShowingRouteDeleteConfirm) {
+            Button("Cancel") {
+                routeToDelete = nil
+            }
+            Button("Delete") {
+                if let route = routeToDelete {
+                    deleteRoute(route)
+                }
+                routeToDelete = nil
+            }
+        } message: {
+            Text("This action cannot be undone")
+        }
     }
     
     private func sendToWatch(_ route: Route) {
@@ -153,6 +170,9 @@ struct SessionsListView: View {
     let onSessionTap: (Session) -> Void
     
     @State private var sessionToEdit: Session?
+    @State private var sessionToDelete: Session?
+    
+    @State private var isShowingSessionDeleteConfirm = false
     
     var body: some View {
         List {
@@ -176,9 +196,11 @@ struct SessionsListView: View {
                 }
                 .buttonStyle(.plain)
                 .swipeActions(edge: .trailing) {
-                    Button("Delete", systemImage: "trash", role: .destructive) {
-                        deleteSession(session)
+                    Button("Delete", systemImage: "trash") {
+                        sessionToDelete = session
+                        isShowingSessionDeleteConfirm = true
                     }
+                    .tint(.red)
                     Button("Edit", systemImage: "pencil") {
                         sessionToEdit = session
                     }
@@ -202,6 +224,19 @@ struct SessionsListView: View {
                     Text("Finish session and it will appear here")
                 }
             }
+        }
+        .alert("Delete Session?", isPresented: $isShowingSessionDeleteConfirm) {
+            Button("Cancel") {
+                sessionToDelete = nil
+            }
+            Button("Delete") {
+                if let session = sessionToDelete {
+                    deleteSession(session)
+                }
+                sessionToDelete = nil
+            }
+        } message: {
+            Text("This action cannot be undone")
         }
     }
     
