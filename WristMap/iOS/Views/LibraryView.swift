@@ -55,10 +55,13 @@ struct LibraryView: View {
 struct RoutesListView: View {
     @Environment(\.modelContext) private var context
     @State private var isShowingAddRoute = false
+    @State private var isShowingEditRoute = false
     
     let watchManager: WatchConnectivityManager
     var routes: [Route]
     let onRouteTap: (Route) -> Void
+
+    @State private var routeToEdit: Route?
     
     var body: some View {
         List {
@@ -86,6 +89,10 @@ struct RoutesListView: View {
                     Button("Delete", systemImage: "trash", role: .destructive) {
                         deleteRoute(route)
                     }
+                    Button("Edit", systemImage: "pencil") {
+                        routeToEdit = route
+                    }
+                    .tint(.orange)
                 }
             }
         }
@@ -119,6 +126,10 @@ struct RoutesListView: View {
             AddRouteView()
                 .presentationDetents([.medium])
         }
+        .sheet(item: $routeToEdit) { route in
+            EditRouteView(route: route)
+                .presentationDetents([.medium])
+        }
     }
     
     private func sendToWatch(_ route: Route) {
@@ -140,6 +151,8 @@ struct SessionsListView: View {
     
     var sessions: [Session]
     let onSessionTap: (Session) -> Void
+    
+    @State private var sessionToEdit: Session?
     
     var body: some View {
         List {
@@ -166,8 +179,16 @@ struct SessionsListView: View {
                     Button("Delete", systemImage: "trash", role: .destructive) {
                         deleteSession(session)
                     }
+                    Button("Edit", systemImage: "pencil") {
+                        sessionToEdit = session
+                    }
+                    .tint(.orange)
                 }
             }
+        }
+        .sheet(item: $sessionToEdit) { session in
+            EditSessionView(session: session)
+                .presentationDetents([.medium])
         }
         .navigationTitle("Sessions")
         #if os(iOS)
