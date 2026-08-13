@@ -65,9 +65,26 @@ struct RoutesListView: View {
     @State private var routeToEdit: Route?
     @State private var routeToDelete: Route?
     
+    // settings
+    @State private var sortOptions: RouteSortOptions = Settings.routeSortOption
+    
+    var sortedRoutes: [Route] {
+        switch sortOptions {
+        case .dateCreated:
+            return routes.sorted { $0.createdAt > $1.createdAt }
+            
+        case .distanceLowToHigh:
+            return routes.sorted { $0.distance < $1.distance }
+        case .distanceHighToLow:
+            return routes.sorted { $0.distance > $1.distance }
+        case .nameAZ:
+            return routes.sorted { $0.routeName.localizedStandardCompare($1.routeName) == .orderedAscending }
+        }
+    }
+    
     var body: some View {
         List {
-            ForEach(routes) { route in
+            ForEach(sortedRoutes) { route in
                 Button { onRouteTap(route) } label: {
                     HStack {
                         Image(systemName: "map")
@@ -106,7 +123,22 @@ struct RoutesListView: View {
         .navigationBarTitleDisplayMode(.inline)
         #endif
         .toolbar {
-            ToolbarItem(placement: .confirmationAction) {
+            ToolbarItem(placement: .topBarLeading) {
+                Menu {
+                    Picker("Sort by", selection: $sortOptions) {
+                        Text("A-Z").tag(RouteSortOptions.nameAZ)
+                        Text("Most Recent First").tag(RouteSortOptions.dateCreated)
+                        Text("Distance High to Low").tag(RouteSortOptions.distanceHighToLow)
+                        Text("Distance Low to High").tag(RouteSortOptions.distanceLowToHigh)
+                    }
+                    .onChange(of: sortOptions) {
+                        Settings.routeSortOption = sortOptions
+                    }
+                } label: {
+                    Image(systemName: "line.3.horizontal.decrease")
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
                 Button("Add", systemImage: "plus") {
                     isShowingAddRoute.toggle()
                 }
@@ -167,6 +199,25 @@ struct SessionsListView: View {
     @Environment(\.modelContext) private var context
     
     var sessions: [Session]
+    private var sortedSessions: [Session] {
+        switch sortOptions {
+        case .dateCreated:
+            return sessions.sorted { $0.startedAt > $1.startedAt }
+        case .finishedAt:
+            return sessions
+            
+        case .durationLowToHigh:
+            return sessions.sorted { $0.duration < $1.duration }
+        case .durationHighToLow:
+            return sessions.sorted { $0.duration > $1.duration }
+            
+        case .distanceLowToHigh:
+            return sessions.sorted { $0.distance < $1.distance }
+        case .distanceHighToLow:
+            return sessions.sorted { $0.distance > $1.distance }
+        }
+    }
+    
     let onSessionTap: (Session) -> Void
     
     @State private var sessionToEdit: Session?
@@ -174,9 +225,12 @@ struct SessionsListView: View {
     
     @State private var isShowingSessionDeleteConfirm = false
     
+    // settings
+    @State private var sortOptions: SessionSortOptions = Settings.sessionSortOption
+    
     var body: some View {
         List {
-            ForEach(sessions) { session in
+            ForEach(sortedSessions) { session in
                 Button {
                     onSessionTap(session)
                 } label: {
@@ -205,6 +259,24 @@ struct SessionsListView: View {
                         sessionToEdit = session
                     }
                     .tint(.orange)
+                }
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Menu {
+                    Picker("Sort by", selection: $sortOptions) {
+                        Text("Most Recent First").tag(SessionSortOptions.dateCreated)
+                        Text("Distance High to Low").tag(SessionSortOptions.distanceHighToLow)
+                        Text("Distance Low to High").tag(SessionSortOptions.distanceLowToHigh)
+                        Text("Duration High to Low").tag(SessionSortOptions.durationHighToLow)
+                        Text("Duration Low to High").tag(SessionSortOptions.durationLowToHigh)
+                    }
+                    .onChange(of: sortOptions) {
+                        Settings.sessionSortOption = sortOptions
+                    }
+                } label: {
+                    Image(systemName: "line.3.horizontal.decrease")
                 }
             }
         }

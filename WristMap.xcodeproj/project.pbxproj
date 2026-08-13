@@ -51,6 +51,7 @@
 				iOS/Models/RouteDistanceMarkerCalculator.swift,
 				iOS/Models/SelectedMapStyle.swift,
 				iOS/Models/SheetDetent.swift,
+				iOS/Models/SortOptions.swift,
 				Shared/Logic/GPXParser.swift,
 				Shared/Models/DataFormatter.swift,
 				Shared/Models/GPXFileManager.swift,
