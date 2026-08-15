@@ -26,14 +26,7 @@ struct LibraryView: View {
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                Picker("", selection: $selectedTab) {
-                    Text("Routes").tag(LibraryTabs.routes)
-                    Text("Sessions").tag(LibraryTabs.sessions)
-                }
-                .pickerStyle(.segmented)
-                .padding()
-                
+            ZStack(alignment: .top) {
                 switch selectedTab {
                 case .routes:
                     RoutesListView(
@@ -47,11 +40,17 @@ struct LibraryView: View {
                         onSessionTap: { onSessionTap($0) }
                     )
                 }
+                
+                Picker("", selection: $selectedTab) {
+                    Text("Routes").tag(LibraryTabs.routes)
+                    Text("Sessions").tag(LibraryTabs.sessions)
+                }
+                .pickerStyle(.segmented)
+                .background(.regularMaterial, in: Capsule())
+                .padding()
             }
             .navigationTitle(selectedTab == .routes ? "Routes" : "Sessions")
-            #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
-            #endif
         }
     }
 }
@@ -126,6 +125,7 @@ struct RoutesListView: View {
                 }
             }
         }
+        .contentMargins(.top, 60, for: .scrollContent)
         .searchable(text: $searchText, prompt: "Search")
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
@@ -274,6 +274,7 @@ struct SessionsListView: View {
                 }
             }
         }
+        .contentMargins(.top, 60, for: .scrollContent)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Menu {
