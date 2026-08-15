@@ -71,6 +71,35 @@ struct SaveSessionView: View {
                 }
             }
         }
+        .task {
+            guard sessionName.isEmpty else { return }
+            
+            // suggest session name
+            if let suggestedName = await suggestSessionName() {
+                sessionName = suggestedName
+            }
+        }
+    }
+    
+    // suggest session name based on location of start and end points
+    private func suggestSessionName() async -> String? {
+        let startGeodecoder = CLGeocoder()
+        let endGeodecoder = CLGeocoder()
+        
+        guard let startPoint = tracker.locationHistory.first,
+              let endPoint = tracker.locationHistory.last else { return nil }
+        
+        async let start = startGeodecoder.reverseGeocodeLocation(startPoint)
+        async let end = endGeodecoder.reverseGeocodeLocation(endPoint)
+        
+        guard let startCity = try? await start.first?.locality,
+              let endCity = try? await end.first?.locality else { return nil }
+        
+        if startCity == endCity {
+            return startCity
+        } else {
+            return "\(startCity) → \(endCity)"
+        }
     }
     
     private func saveSession(_ activeSession: Session) {
