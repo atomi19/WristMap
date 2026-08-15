@@ -56,6 +56,14 @@ enum DataFormatter {
         return formatter.string(from: measurement)
     }
     
+    static func shortDuration(startedAt: Date, finishedAt: Date?) -> String {
+        let duration = finishedAt?.timeIntervalSince(startedAt) ?? 0
+        let formattedDuration = Duration.seconds(duration)
+            .formatted(.units(allowed: [.hours, .minutes], width: .abbreviated))
+        
+        return formattedDuration
+    }
+    
     static func duration(_ duration: Double) -> String {
         Duration.seconds(duration).formatted()
     }

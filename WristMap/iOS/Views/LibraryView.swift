@@ -97,9 +97,13 @@ struct RoutesListView: View {
         List {
             ForEach(sortedRoutes) { route in
                 Button { onRouteTap(route) } label: {
+                    let formattedDistance = DataFormatter.distance(route.distance)
+                    let formattedDate = route.createdAt.formatted(.dateTime.month(.abbreviated).day())
+                    
                     ItemRow(
                         title: route.routeName,
-                        subtitle: DataFormatter.distance(route.distance)
+                        subtitle: "\(formattedDistance) • \(formattedDate)",
+                        systemImage: "map"
                     )
                 }
                 .buttonStyle(.plain)
@@ -244,9 +248,16 @@ struct SessionsListView: View {
                 Button {
                     onSessionTap(session)
                 } label: {
+                    let formattedDistance = DataFormatter.distance(session.distance)
+                    let formattedDuration = DataFormatter.shortDuration(
+                        startedAt: session.startedAt,
+                        finishedAt: session.finishedAt
+                    )
+                    
                     ItemRow(
                         title: session.name,
-                        subtitle: DataFormatter.distance(session.distance)
+                        subtitle: "\(formattedDistance) • \(formattedDuration)",
+                        systemImage: "figure.outdoor.cycle"
                     )
                 }
                 .buttonStyle(.plain)
@@ -321,18 +332,29 @@ struct SessionsListView: View {
 struct ItemRow: View {
     let title: String
     let subtitle: String
-    
+    let systemImage: String
+
     var body: some View {
-        HStack {
-            Image(systemName: "map")
-                .foregroundStyle(.secondary)
-            VStack(alignment: .leading) {
+        HStack(spacing: 14) {
+            Image(systemName: systemImage)
+                .font(.system(size: 18, weight: .medium))
+                .foregroundStyle(.tint)
+                .frame(width: 40, height: 40)
+                .background(.tint.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
+
+            VStack(alignment: .leading, spacing: 3) {
                 Text(title)
+                    .font(.headline)
+                    .lineLimit(1)
+
                 Text(subtitle)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+                    .lineLimit(1)
             }
+            Spacer()
         }
+        .padding(.vertical, 6)
     }
 }
 
