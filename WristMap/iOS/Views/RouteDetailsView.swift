@@ -51,47 +51,24 @@ struct RouteDetailsView: View {
         let optimizedElevationPoints = optimizeElevationPoints(points: allPoints, targetCount: 200)
         return optimizedElevationPoints
     }
+    private var maxElevation: Double { elevationPoints.map(\.elevation).max() ?? 0 }
+    private var minElevation: Double { elevationPoints.map(\.elevation).min() ?? 0 }
+    private var gainAndLoss: (gain: Double, loss: Double) {
+        calculateGainAndLoss(points: elevationPoints)
+    }
     
     var body: some View {
         NavigationStack {
-            VStack {
+            VStack(spacing: 24) {
                 // show chart only if sheet is expanded
                 if selectedDetents != SheetDetent.compact {
-                    Chart(elevationPoints) { point in
-                        LineMark(
-                            x: .value("Distance", point.distance),
-                            y: .value("Elevation", point.elevation)
-                        )
-                    }
-                    // limit x by start and end of route (so there is no padding inside the chart)
-                    .chartXScale(domain: elevationPoints.first!.distance...elevationPoints.last!.distance)
-                    .chartXAxis {
-                        AxisMarks { value in
-                            AxisGridLine()
-                            AxisTick()
-                            
-                            AxisValueLabel {
-                                if let distance = value.as(Double.self) {
-                                    Text(DataFormatter.shortDistance(distance))
-                                }
-                            }
-                        }
-                    }
-                    .chartYAxis {
-                        AxisMarks(position: .leading) { value in
-                            AxisGridLine()
-                            AxisTick()
-                            
-                            AxisValueLabel {
-                                if let elevation = value.as(Double.self) {
-                                    Text(DataFormatter.shortDistance(elevation))
-                                }
-                            }
-                        }
-                    }
-                    .frame(height: 150)
-                    .padding()
+                    elevationSummary
                 }
+                if selectedDetents == .large {
+                    elevationChart
+                }
+                
+                Spacer()
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -117,7 +94,14 @@ struct RouteDetailsView: View {
                 }
             }
         }
-        .bottomSheetStyle(selectedDetent: $selectedDetents)
+        .bottomSheetStyle(
+            detents: [
+                SheetDetent.compact,
+                SheetDetent.medium,
+                SheetDetent.large
+            ],
+            selectedDetent: $selectedDetents
+        )
     }
     
     // optimize elevation points to max 200
@@ -150,6 +134,105 @@ struct RouteDetailsView: View {
         }
         
         return result
+    }
+    
+    private var elevationSummary: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 16) {
+                SessionDetailsTextView(
+                    label: "Elevation Gain",
+                    dataText: "\(DataFormatter.elevation(gainAndLoss.gain))"
+                )
+                SessionDetailsTextView(
+                    label: "Elevation Loss",
+                    dataText: "\(DataFormatter.elevation(gainAndLoss.loss))"
+                )
+            }
+            
+            Spacer()
+            
+            VStack(alignment: .leading, spacing: 16) {
+                SessionDetailsTextView(
+                    label: "Max Elevation",
+                    dataText: "\(DataFormatter.elevation(maxElevation))"
+                )
+                SessionDetailsTextView(
+                    label: "Min Elevation",
+                    dataText: "\(DataFormatter.elevation(minElevation))"
+                )
+            }
+        }
+        .padding(.horizontal)
+    }
+    
+    private var elevationChart: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Elevation")
+                .font(.headline)
+                .padding(.horizontal)
+            
+            Chart(elevationPoints) { point in
+                LineMark(
+                    x: .value("Distance", point.distance),
+                    y: .value("Elevation", point.elevation)
+                )
+            }
+            // limit x by start and end of route (so there is no padding inside the chart)
+            .chartXScale(domain: elevationPoints.first!.distance...elevationPoints.last!.distance)
+            .chartXAxis {
+                AxisMarks { value in
+                    AxisGridLine()
+                    AxisTick()
+                    
+                    AxisValueLabel {
+                        if let distance = value.as(Double.self) {
+                            Text(DataFormatter.shortDistance(distance))
+                        }
+                    }
+                }
+            }
+            .chartYAxis {
+                AxisMarks(position: .leading) { value in
+                    AxisGridLine()
+                    AxisTick()
+                    
+                    AxisValueLabel {
+                        if let elevation = value.as(Double.self) {
+                            Text(DataFormatter.shortDistance(elevation))
+                        }
+                    }
+                }
+            }
+            .frame(height: 150)
+            .padding()
+        }
+    }
+    
+    // calculate gain and loss evelation
+    private func calculateGainAndLoss(points: [ElevationPoint]) -> (gain: Double, loss: Double) {
+        guard points.count > 1 else { return (0, 0) }
+        
+        let threshold: Double = 2.0
+        
+        var gain = 0.0
+        var loss = 0.0
+        var lastSignificantElevation = points[0].elevation
+        
+        for point in points.dropFirst() {
+            let delta = point.elevation - lastSignificantElevation
+            
+            if abs(delta) >= threshold {
+                if delta > 0 {
+                    gain += delta
+                } else {
+                    loss += abs(delta)
+                }
+                
+                lastSignificantElevation = point.elevation
+            }
+        }
+        
+        return (gain, loss)
     }
 }
 

@@ -56,6 +56,20 @@ enum DataFormatter {
         return formatter.string(from: measurement)
     }
     
+    static func elevation(_ meters: Double) -> String {
+        let formatter = MeasurementFormatter()
+        
+        formatter.unitOptions = .providedUnit
+        formatter.unitStyle = .short
+        formatter.numberFormatter.maximumFractionDigits = 0
+        
+        let measurement: Measurement<UnitLength> = measurementPreference.usesMetric
+        ? Measurement(value: meters, unit: UnitLength.meters)
+        : Measurement(value: meters, unit: UnitLength.meters).converted(to: .feet)
+        
+        return formatter.string(from: measurement)
+    }
+    
     static func shortDuration(startedAt: Date, finishedAt: Date?) -> String {
         let duration = finishedAt?.timeIntervalSince(startedAt) ?? 0
         let formattedDuration = Duration.seconds(duration)
