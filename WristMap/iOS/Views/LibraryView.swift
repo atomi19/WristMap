@@ -107,6 +107,15 @@ struct RoutesListView: View {
                 }
                 .buttonStyle(.plain)
                 .swipeActions(edge: .leading) {
+                    let fileURL = GPXFileManager.fileURL(for: route.uuid)
+                    
+                    ShareLink(
+                        item: fileURL,
+                        preview: SharePreview(route.routeName, icon: "map")
+                    ) {
+                        Label("Share GPX File", systemImage: "square.and.arrow.up")
+                    }
+                    
                     Button("Send to Watch", systemImage: "applewatch") {
                         sendToWatch(route)
                     }
