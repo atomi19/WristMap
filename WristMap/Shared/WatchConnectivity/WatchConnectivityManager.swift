@@ -37,9 +37,16 @@ final class WatchConnectivityManager: NSObject, WCSessionDelegate {
         }
     }
     
+    
     #if os(iOS)
     func sessionDidBecomeInactive(_ session: WCSession) {}
     
     func sessionDidDeactivate(_ session: WCSession) {}
+    
+    var canShareToWatch: Bool {
+        WCSession.isSupported() &&
+        WCSession.default.isPaired &&
+        WCSession.default.isWatchAppInstalled
+    }
     #endif
 }

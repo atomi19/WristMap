@@ -116,10 +116,12 @@ struct RoutesListView: View {
                         Label("Share GPX File", systemImage: "square.and.arrow.up")
                     }
                     
-                    Button("Send to Watch", systemImage: "applewatch") {
-                        sendToWatch(route)
+                    if watchManager.canShareToWatch {                    
+                        Button("Send to Watch", systemImage: "applewatch") {
+                            sendToWatch(route)
+                        }
+                        .tint(.blue)
                     }
-                    .tint(.blue)
                 }
                 .swipeActions(edge: .trailing) {
                     Button("Delete", systemImage: "trash") {
