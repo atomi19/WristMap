@@ -82,9 +82,6 @@ struct HomeMapView: View {
                     position: $position,
                     userTrackingMode: $trackingMode
                 )
-                .foregroundStyle(.primary)
-                .frame(width: 44, height: 44)
-                .background(.ultraThinMaterial, in: Circle())
                 if let currentCamera, currentCamera.heading != 0 {
                     CustomCompassButton(
                         heading: currentCamera.heading,
@@ -97,9 +94,6 @@ struct HomeMapView: View {
                             }
                         }
                     )
-                    .foregroundStyle(.primary)
-                    .frame(width: 44, height: 44)
-                    .background(.ultraThinMaterial, in: Circle())
                 }
             }
             .padding()

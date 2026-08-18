@@ -39,9 +39,23 @@ struct MoreMenuView: View {
             }
         } label: {
             Image(systemName: "line.3.horizontal")
+                .frame(width: 32, height: 32)
+        }
+        .modifier(MoreMenuButtonStyle())
+    }
+}
+
+private struct MoreMenuButtonStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 26.0, *) {
+            content
+                .buttonStyle(.glass)
+                .buttonBorderShape(.circle)
+        } else {
+            content
                 .frame(width: 44, height: 44)
+                .foregroundStyle(.primary)
                 .background(.ultraThinMaterial, in: Circle())
         }
-        .foregroundStyle(.primary)
     }
 }
