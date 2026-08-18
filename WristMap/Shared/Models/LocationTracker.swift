@@ -131,11 +131,19 @@ class LocationTracker: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
     
     private func setTimer() {
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
-            guard let self, let start = self.locationHistory.first?.timestamp else {return}
+        timer?.invalidate()
+        
+        timer = Timer.scheduledTimer(
+            withTimeInterval: 1,
+            repeats: true
+        ) { [weak self] _ in
+            guard let self else { return }
+                    
+            guard let start = self.locationHistory.first?.timestamp else { return }
             
             // set speed to 0 if last location update is > 5 sec
-            if let lastLocationUpdate, Date().timeIntervalSince(lastLocationUpdate) > 5 {
+            if let lastLocationUpdate,
+                Date().timeIntervalSince(lastLocationUpdate) > 5 {
                 speed = 0
             }
             
@@ -153,6 +161,7 @@ class LocationTracker: NSObject, ObservableObject, CLLocationManagerDelegate {
         
         lastLocation = nil
         timer?.invalidate()
+        timer = nil
         lastLocationUpdate = nil
     }
 }

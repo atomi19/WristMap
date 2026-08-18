@@ -117,8 +117,11 @@ struct SaveSessionView: View {
             activeSession.name = sessionName
             activeSession.sessionPoints = points
             activeSession.distance = tracker.distance
-            activeSession.finishedAt = .now
-            activeSession.duration = tracker.duration
+            
+            let finishedAt = Date()
+            activeSession.finishedAt = finishedAt
+            activeSession.duration = finishedAt.timeIntervalSince(activeSession.startedAt)
+            
             activeSession.movingDuration = 0
             activeSession.averageSpeed = tracker.averageSpeed
             activeSession.maxSpeed = tracker.maxSpeed
