@@ -271,13 +271,13 @@
 				INFOPLIST_KEY_CFBundleDisplayName = WristMap;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location permission is needed to view your location on the map";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = io.github.atomi19.WristMap;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = io.github.atomi19.WristMapApp;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.2.2;
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.atomi19.WristMap.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.atomi19.WristMapApp.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -305,13 +305,13 @@
 				INFOPLIST_KEY_CFBundleDisplayName = WristMap;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location permission is needed to view your location on the map";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = io.github.atomi19.WristMap;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = io.github.atomi19.WristMapApp;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.2.2;
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.atomi19.WristMap.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.atomi19.WristMapApp.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -481,7 +481,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.5;
 				MARKETING_VERSION = 0.2.2;
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.atomi19.WristMap;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.atomi19.WristMapApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -531,7 +531,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.5;
 				MARKETING_VERSION = 0.2.2;
-				PRODUCT_BUNDLE_IDENTIFIER = io.github.atomi19.WristMap;
+				PRODUCT_BUNDLE_IDENTIFIER = io.github.atomi19.WristMapApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;

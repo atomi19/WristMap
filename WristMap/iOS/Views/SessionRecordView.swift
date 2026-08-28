@@ -114,19 +114,21 @@ struct SessionRecordView: View {
                 .presentationDetents([.medium])
             }
         }
-        .onChange(of: tracker.locationHistory) {
-            if let activeSession {
-                let points: [SessionPoint] = tracker.locationHistory.map { point in
-                    SessionPoint(
-                        latitude: point.coordinate.latitude,
-                        longitude: point.coordinate.longitude,
-                        elevation: point.altitude,
-                        speed: point.speed,
-                        timestamp: point.timestamp,
-                    )
-                }
-                activeSession.sessionPoints = points
+        .onChange(of: tracker.locationHistory) { oldValue, newValue in
+            guard let activeSession else { return }
+            guard newValue.count > oldValue.count else { return }
+            
+            let newPoints = newValue[oldValue.count...].map { point in
+                SessionPoint(
+                    latitude: point.coordinate.latitude,
+                    longitude: point.coordinate.longitude,
+                    elevation: point.altitude,
+                    speed: point.speed,
+                    timestamp: point.timestamp,
+                )
             }
+            
+            activeSession.sessionPoints.append(contentsOf: newPoints)
         }
         .onAppear {
             if isSessionRestored {
