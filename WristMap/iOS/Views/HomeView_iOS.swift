@@ -21,8 +21,11 @@ enum ActiveSheet: Identifiable {
 }
 
 struct HomeView_iOS: View {
+    @Environment(\.modelContext) private var context
+    
     @StateObject private var tracker = LocationTracker()
     @State private var viewModel = HomeViewModel()
+    @State private var sessionManager = SessionManager()
     
     @State private var locationManager = CLLocationManager()
     @State private var trackingMode: UserTrackingModes = .follow
@@ -60,7 +63,7 @@ struct HomeView_iOS: View {
                 tracker: tracker,
                 position: $position,
                 points: viewModel.points,
-                sessionPoints: viewModel.sessionPoints,
+                sessionPoints: sessionManager.sessionPoints,
                 trackingPoints: tracker.locationHistory,
                 routeDistanceMarkers: viewModel.routeDistanceMarkers,
                 selectedMapStyle: $selectedMapStyle,
@@ -90,12 +93,20 @@ struct HomeView_iOS: View {
                     trackingMode = .none
                 }
             }
+            .onChange(of: tracker.locationHistory) { oldValue, newValue in
+                guard newValue.count > oldValue.count else { return }
+                
+                sessionManager.recordNewPoints(
+                    newLocations: Array(newValue[oldValue.count...]),
+                    context: context
+                )
+            }
             .onAppear {
                 locationManager.requestWhenInUseAuthorization()
                 
                 // restore last session if it is uncompleted (finishedAt == nil)
-                if viewModel.restoreActiveSession(from: sessions) {
-                    tracker.locationHistory = viewModel.sessionPoints
+                if sessionManager.restoreActiveSession(from: sessions) {
+                    tracker.locationHistory = sessionManager.sessionPoints
                     activeSheet = .sessionRecord
                 }
             }
@@ -122,13 +133,14 @@ struct HomeView_iOS: View {
             SettingsView()
         case .library:
             LibraryView(
+                sessionManager: sessionManager,
                 sessions: sessions,
                 onRouteTap: { route in
                     viewModel.selectedRoute = route
                     activeSheet = nil
                 },
                 onSessionTap: { session in
-                    viewModel.select(session: session)
+                    sessionManager.select(session: session)
                     activeSheet = .sessionDetails
                 }
             )
@@ -143,57 +155,39 @@ struct HomeView_iOS: View {
                         viewModel.clearRoute()
                         activeSheet = nil
                     },
-                    recenter: recenter,
+                    recenter: recenterOnRoute,
                 )
             }
         case .sessionRecord:
             SessionRecordView(
                 tracker: tracker,
+                sessionManager: sessionManager,
                 selectedDetents: $sessionRecordDetent,
-                activeSession: $viewModel.selectedSession,
-                isSessionRestored: $viewModel.isSessionRestored,
                 isSessionActive: $shouldOpenSessionRecordBack
             )
         case .sessionDetails:
-            if let session = viewModel.selectedSession {
+            if let session = sessionManager.selectedSession {
                 SessionDetailsView(
                     selectedDetents: $sessionDetailsDetent,
                     session: session,
                     isRouteRecenterActive: isRouteRecenterActive,
                     onClose: {
                         activeSheet = nil
-                        viewModel.sessionPoints.removeAll()
+                        sessionManager.sessionPoints.removeAll()
                     },
-                    recenter: recenter,
+                    recenter: recenterOnRoute,
                 )
             }
         }
     }
     
-    private func recenter(coordinates: [CLLocationCoordinate2D]) {
-        var rect = MKMapRect.null
-        trackingMode = .none
-        
-        for coordinate in coordinates {
-            rect = rect.union(
-                MKMapRect(
-                    origin: MKMapPoint(coordinate),
-                    size: MKMapSize(width: 1, height: 1)
-                )
-            )
-        }
-        
-        // add padding from the screen edges when recenter on route
-        let paddingRect = rect.insetBy(
-            dx: -rect.size.width * 0.2,
-            dy: -rect.size.height * 0.2
+    private func recenterOnRoute(coordinates: [CLLocationCoordinate2D]) {
+        MapRecenter.recenter(
+            coordinates: coordinates,
+            position: $position,
+            trackingMode: $trackingMode,
+            isRouteRecenterActive: $isRouteRecenterActive
         )
-        
-        withAnimation(.easeInOut) {
-            position = .rect(paddingRect)
-        }
-        
-        isRouteRecenterActive = true
     }
 }
 

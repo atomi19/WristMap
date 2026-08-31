@@ -16,6 +16,10 @@ enum LocationTrackerStatus {
 class LocationTracker: NSObject, ObservableObject, CLLocationManagerDelegate {
     private var locationManager = CLLocationManager()
     
+    #if os(watchOS)
+    private let workoutManager = WatchWorkoutManager()
+    #endif
+    
     @Published var locationHistory: [CLLocation] = []
     @Published var trackerStatus: LocationTrackerStatus = .inactive
     @Published var speed: CLLocationSpeed = 0
@@ -164,4 +168,27 @@ class LocationTracker: NSObject, ObservableObject, CLLocationManagerDelegate {
         timer = nil
         lastLocationUpdate = nil
     }
+    
+    #if os(watchOS)
+    func startWorkoutTracking() {
+        locationHistory.removeAll()
+        resetTracker()
+        
+        workoutManager.startWorkoutSession()
+        locationManager.startUpdatingLocation()
+        
+        trackerStatus = .active
+        setTimer()
+    }
+    
+    func stopWorkoutTracking() {
+        locationManager.stopUpdatingLocation()
+        workoutManager.stopWorkoutSession()
+        
+        trackerStatus = .inactive
+        
+        timer?.invalidate()
+        timer = nil
+    }
+    #endif
 }

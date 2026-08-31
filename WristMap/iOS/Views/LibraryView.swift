@@ -13,6 +13,7 @@ private enum LibraryTabs: Int {
 
 struct LibraryView: View {
     let watchManager = WatchConnectivityManager()
+    var sessionManager: SessionManager
     
     @Query
     private var routes: [Route]
@@ -36,6 +37,7 @@ struct LibraryView: View {
                     )
                 case .sessions:
                     SessionsListView(
+                        sessionManager: sessionManager,
                         sessions: sessions,
                         onSessionTap: { onSessionTap($0) }
                     )
@@ -216,6 +218,8 @@ struct RoutesListView: View {
 struct SessionsListView: View {
     @Environment(\.modelContext) private var context
     
+    var sessionManager: SessionManager
+    
     var sessions: [Session]
     private var sortedSessions: [Session] {
         let filteredSessions: [Session] = sessions.filter { session in
@@ -328,16 +332,14 @@ struct SessionsListView: View {
             },
             onDelete: {
                 if let session = sessionToDelete {
-                    deleteSession(session)
+                    sessionManager.deleteSession(
+                        context: context,
+                        session: session
+                    )
                 }
                 sessionToDelete = nil
             }
         )
-    }
-    
-    private func deleteSession(_ session: Session) {
-        context.delete(session)
-        try? context.save()
     }
 }
 

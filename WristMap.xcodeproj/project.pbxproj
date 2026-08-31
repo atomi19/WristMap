@@ -57,16 +57,23 @@
 				Shared/Models/GPXFileManager.swift,
 				Shared/Models/GPXPoint.swift,
 				Shared/Models/LocationTracker.swift,
+				Shared/Models/MapRecenter.swift,
 				Shared/Models/Route.swift,
 				Shared/Models/Session.swift,
+				Shared/Models/SessionManager.swift,
 				Shared/Models/SessionPoint.swift,
 				Shared/Views/CustomCompassButton.swift,
 				Shared/Views/CustomUserLocationButton.swift,
+				Shared/Views/SaveSessionView.swift,
 				Shared/Views/SessionDetailsTextView.swift,
 				Shared/WatchConnectivity/WatchConnectivityManager.swift,
 				Shared/WatchConnectivity/WatchSessionManager.swift,
 				watchOS/Assets.xcassets,
+				watchOS/Models/WatchWorkoutManager.swift,
 				watchOS/Views/HomeView_watchOS.swift,
+				watchOS/Views/MoreMenuView_watchOS.swift,
+				watchOS/Views/SessionDetailRow.swift,
+				watchOS/Views/SessionDetailsView.swift,
 				watchOS/WristMapWatchApp.swift,
 			);
 			target = 3A0193A92FF6B0DB00BDBD6A /* WristMap Watch App */;
@@ -77,7 +84,10 @@
 				Info.plist,
 				Shared/WatchConnectivity/WatchSessionManager.swift,
 				watchOS/Assets.xcassets,
+				watchOS/Models/WatchWorkoutManager.swift,
 				watchOS/Views/HomeView_watchOS.swift,
+				watchOS/Views/MoreMenuView_watchOS.swift,
+				watchOS/Views/SessionDetailsView.swift,
 				watchOS/WristMapWatchApp.swift,
 			);
 			target = 3A9030922FF2ED5100ABFF48 /* WristMap */;
@@ -268,6 +278,7 @@
 				DEVELOPMENT_TEAM = 327D6Q6KBQ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "WristMap-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = WristMap;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location permission is needed to view your location on the map";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
@@ -302,6 +313,7 @@
 				DEVELOPMENT_TEAM = 327D6Q6KBQ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "WristMap-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = WristMap;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Location permission is needed to view your location on the map";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";

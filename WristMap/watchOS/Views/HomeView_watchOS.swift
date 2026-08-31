@@ -6,8 +6,10 @@
 import SwiftUI
 import MapKit
 import CoreLocation
+import SwiftData
 
 struct HomeView_watchOS: View {
+    @Environment(\.modelContext) private var context
     @State private var locationManager = CLLocationManager()
     @State private var position: MapCameraPosition = .userLocation(followsHeading: false, fallback: .automatic)
     @State private var trackingMode: UserTrackingModes = .follow
@@ -16,6 +18,15 @@ struct HomeView_watchOS: View {
     @State private var points: [GPXPoint] = []
     @State private var isRouteRecenterActive: Bool = false
     
+    @StateObject private var tracker = LocationTracker()
+    @State private var isShowingMoreMenuSheet: Bool = false
+    
+    @State private var sessionManager = SessionManager()
+    
+    // sessions
+    @Query(sort: \Session.startedAt, order: .reverse)
+    private var sessions: [Session]
+    
     var body: some View {
         NavigationStack {
             Map(position: $position) {
@@ -23,6 +34,11 @@ struct HomeView_watchOS: View {
                 if points.count >  1 {
                     MapPolyline(coordinates: points.map(\.coordinate))
                         .stroke(.blue, lineWidth: 4)
+                }
+                // session recording route
+                if !tracker.locationHistory.isEmpty {
+                    MapPolyline(coordinates: tracker.locationHistory.map(\.coordinate))
+                        .stroke(.red, lineWidth: 4)
                 }
             }
             .onChange(of: watchSession.receivedFile) {
@@ -34,8 +50,26 @@ struct HomeView_watchOS: View {
                     print(error)
                 }
             }
+            .onChange(of: tracker.locationHistory) { oldValue, newValue in
+                guard newValue.count > oldValue.count else { return }
+                
+                sessionManager.recordNewPoints(
+                    newLocations: Array(newValue[oldValue.count...]),
+                    context: context
+                )
+            }
             .onAppear {
                 locationManager.requestWhenInUseAuthorization()
+                
+                // restore last session if it is uncompleted
+                // so finishedAt == nil
+                if sessionManager.restoreActiveSession(from: sessions) {
+                    tracker.locationHistory = sessionManager.sessionPoints
+                    tracker.restoreTracking()
+                    sessionManager.isSessionActive = true
+                    sessionManager.isSessionRestored = true
+                    isShowingMoreMenuSheet = true
+                }
             }
             .onChange(of: position) {_, newValue in
                 if newValue.positionedByUser {
@@ -44,8 +78,14 @@ struct HomeView_watchOS: View {
                 }
             }
             .toolbar {
-                // location
+                // more menu
                 ToolbarItem(placement: .topBarLeading) {
+                    Button("Menu", systemImage: "line.horizontal.3") {
+                        isShowingMoreMenuSheet = true
+                    }
+                }
+                // location
+                ToolbarItem(placement: .bottomBar) {
                     CustomUserLocationButton(
                         position: $position,
                         userTrackingMode: $trackingMode
@@ -62,27 +102,23 @@ struct HomeView_watchOS: View {
                     }
                 }
             }
+            .sheet(isPresented: $isShowingMoreMenuSheet) {
+                MoreMenuView_watchOS(
+                    tracker: tracker,
+                    sessionManager: sessionManager,
+                    sessions: sessions
+                )
+            }
         }
     }
     
     private func recenterOnRoute() {
-        var rect = MKMapRect.null
-        trackingMode = .none
-        
-        for point in points {
-            rect = rect.union(
-                MKMapRect(
-                    origin: MKMapPoint(point.coordinate),
-                    size: MKMapSize(width: 1, height: 1)
-                )
-            )
-        }
-        
-        withAnimation(.easeInOut) {
-            position = .rect(rect)
-        }
-        
-        isRouteRecenterActive = true
+        MapRecenter.recenter(
+            coordinates: points.map(\.coordinate),
+            position: $position,
+            trackingMode: $trackingMode,
+            isRouteRecenterActive: $isRouteRecenterActive
+        )
     }
 }
 

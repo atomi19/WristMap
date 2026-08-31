@@ -15,5 +15,6 @@ struct WristMapWatchApp: App {
             HomeView_watchOS()
                 .environment(watchConnectivityManager)
         }
+        .modelContainer(for: [Session.self])
     }
 }

@@ -8,6 +8,7 @@ import SwiftData
 import Foundation
 import CoreLocation
 
+// reused across ios and watchos
 struct SaveSessionView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss

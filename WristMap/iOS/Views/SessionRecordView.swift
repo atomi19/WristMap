@@ -11,9 +11,8 @@ struct SessionRecordView: View {
     @Environment(\.modelContext) private var context
     
     @ObservedObject var tracker: LocationTracker
+    var sessionManager: SessionManager
     @Binding var selectedDetents: PresentationDetent
-    @Binding var activeSession: Session?
-    @Binding var isSessionRestored: Bool
     @Binding var isSessionActive: Bool
     
     @State private var isShowingSaveSession: Bool = false
@@ -32,14 +31,14 @@ struct SessionRecordView: View {
                 }
                 Spacer()
                 // start tracking
-                if tracker.trackerStatus == .inactive && !isSessionRestored {
+                if tracker.trackerStatus == .inactive && !sessionManager.isSessionRestored {
                     SessionActionButton(
                         title: "Start",
                         systemImage: "play",
                         tint: .blue,
                         action: {
                             tracker.startTracking()
-                            createSession()
+                            sessionManager.createEmptySession(context: context)
                             isSessionActive = true
                         }
                     )
@@ -97,60 +96,31 @@ struct SessionRecordView: View {
                 .buttonStyle(.bordered)
                 .tint(.red)
                 .controlSize(.large)
-                .disabled(activeSession == nil)
+                .disabled(sessionManager.selectedSession == nil)
             }
         }
         .padding()
         .sheet(isPresented: $isShowingSaveSession) {
-            if let session = activeSession {
+            if let session = sessionManager.selectedSession {
                 SaveSessionView(
                     tracker: tracker,
                     isSessionActive: $isSessionActive,
                     activeSession: session,
                     onSessionDiscarded: {
-                        activeSession = nil
+                        sessionManager.selectedSession = nil
                     }
                 )
                 .presentationDetents([.medium])
             }
         }
-        .onChange(of: tracker.locationHistory) { oldValue, newValue in
-            guard let activeSession else { return }
-            guard newValue.count > oldValue.count else { return }
-            
-            let newPoints = newValue[oldValue.count...].map { point in
-                SessionPoint(
-                    latitude: point.coordinate.latitude,
-                    longitude: point.coordinate.longitude,
-                    elevation: point.altitude,
-                    speed: point.speed,
-                    timestamp: point.timestamp,
-                )
-            }
-            
-            activeSession.sessionPoints.append(contentsOf: newPoints)
-        }
         .onAppear {
-            if isSessionRestored {
+            if sessionManager.isSessionRestored {
                 tracker.restoreTracking()
-                isSessionRestored = false
+                sessionManager.isSessionRestored = false
                 isSessionActive = true
             }
         }
         .bottomSheetStyle(selectedDetent: $selectedDetents)
-    }
-    
-    // create empty session 
-    private func createSession() {
-        do {
-            let session = Session()
-            activeSession = session
-            
-            context.insert(session)
-            try context.save()
-        } catch {
-            print(error)
-        }
     }
 }
 
