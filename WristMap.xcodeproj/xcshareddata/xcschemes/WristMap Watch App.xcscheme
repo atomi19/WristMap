@@ -61,7 +61,6 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "3A0193A92FF6B0DB00BDBD6A"
             BuildableName = "WristMap Watch App.app"
-            BlueprintName = "WristMap Watch App"
             ReferencedContainer = "container:WristMap.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -78,7 +77,6 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "3A0193A92FF6B0DB00BDBD6A"
             BuildableName = "WristMap Watch App.app"
-            BlueprintName = "WristMap Watch App"
             ReferencedContainer = "container:WristMap.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

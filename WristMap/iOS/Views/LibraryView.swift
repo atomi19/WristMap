@@ -12,7 +12,7 @@ private enum LibraryTabs: Int {
 }
 
 struct LibraryView: View {
-    let watchManager = WatchConnectivityManager()
+    @Environment(WatchConnectivityManager.self) private var watchManager
     var sessionManager: SessionManager
     
     @Query
@@ -102,6 +102,7 @@ struct RoutesListView: View {
                     let formattedDate = route.createdAt.formatted(.dateTime.month(.abbreviated).day())
                     
                     ItemRow(
+                        recordedOn: nil,
                         title: route.routeName,
                         subtitle: "\(formattedDistance) • \(formattedDate)",
                         systemImage: "map"
@@ -270,6 +271,7 @@ struct SessionsListView: View {
                     )
                     
                     ItemRow(
+                        recordedOn: session.recordedOn,
                         title: session.name,
                         subtitle: "\(formattedDistance) • \(formattedDuration)",
                         systemImage: "figure.outdoor.cycle"
@@ -344,6 +346,7 @@ struct SessionsListView: View {
 }
 
 struct ItemRow: View {
+    let recordedOn: RecordingSource?
     let title: String
     let subtitle: String
     let systemImage: String
@@ -367,6 +370,10 @@ struct ItemRow: View {
                     .lineLimit(1)
             }
             Spacer()
+            if recordedOn == .appleWatch {
+                Image(systemName: "applewatch")
+                    .foregroundStyle(.secondary)
+            }
         }
         .padding(.vertical, 6)
     }

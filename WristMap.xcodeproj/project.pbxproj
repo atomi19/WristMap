@@ -62,18 +62,18 @@
 				Shared/Models/Session.swift,
 				Shared/Models/SessionManager.swift,
 				Shared/Models/SessionPoint.swift,
+				Shared/Models/SessionSync.swift,
 				Shared/Views/CustomCompassButton.swift,
 				Shared/Views/CustomUserLocationButton.swift,
 				Shared/Views/SaveSessionView.swift,
 				Shared/Views/SessionDetailsTextView.swift,
 				Shared/WatchConnectivity/WatchConnectivityManager.swift,
-				Shared/WatchConnectivity/WatchSessionManager.swift,
 				watchOS/Assets.xcassets,
 				watchOS/Models/WatchWorkoutManager.swift,
 				watchOS/Views/HomeView_watchOS.swift,
 				watchOS/Views/MoreMenuView_watchOS.swift,
 				watchOS/Views/SessionDetailRow.swift,
-				watchOS/Views/SessionDetailsView.swift,
+				watchOS/Views/SessionDetailsView_watchOS.swift,
 				watchOS/WristMapWatchApp.swift,
 			);
 			target = 3A0193A92FF6B0DB00BDBD6A /* WristMap Watch App */;
@@ -82,12 +82,11 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-				Shared/WatchConnectivity/WatchSessionManager.swift,
 				watchOS/Assets.xcassets,
 				watchOS/Models/WatchWorkoutManager.swift,
 				watchOS/Views/HomeView_watchOS.swift,
 				watchOS/Views/MoreMenuView_watchOS.swift,
-				watchOS/Views/SessionDetailsView.swift,
+				watchOS/Views/SessionDetailsView_watchOS.swift,
 				watchOS/WristMapWatchApp.swift,
 			);
 			target = 3A9030922FF2ED5100ABFF48 /* WristMap */;

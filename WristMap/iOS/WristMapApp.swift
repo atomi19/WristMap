@@ -8,7 +8,8 @@ import SwiftData
 
 @main
 struct WristMapApp: App {
-    @State private var watchConnectivityManager = WatchConnectivityManager()
+    private let modelContainer: ModelContainer
+    @State private var watchConnectivityManager: WatchConnectivityManager
     
     // app theme
     @AppStorage(Settings.Keys.appTheme)
@@ -18,12 +19,21 @@ struct WristMapApp: App {
         AppTheme(rawValue: appThemeRawValue) ?? .system
     }
     
+    init() {
+        let container = try! ModelContainer(for: Route.self, Session.self)
+        let manager = WatchConnectivityManager()
+        
+        manager.configure(modelContainer: container)
+        modelContainer = container
+        _watchConnectivityManager = State(initialValue: manager)
+    }
+    
     var body: some Scene {
         WindowGroup {
             HomeView_iOS()
                 .environment(watchConnectivityManager)
                 .preferredColorScheme(appTheme.colorScheme)
         }
-        .modelContainer(for: [Route.self, Session.self])
+        .modelContainer(modelContainer)
     }
 }

@@ -61,6 +61,11 @@ final class SessionManager {
     
     func createEmptySession(context: ModelContext) {
         let session = Session()
+        #if os(watchOS)
+        session.recordedOn = .appleWatch
+        session.syncStatus = .pending
+        #endif
+        
         context.insert(session)
         
         do {
@@ -68,6 +73,7 @@ final class SessionManager {
         } catch {
             print("Failed to create session: \(error)")
             context.delete(session)
+            selectedSession = nil
         }
         
         selectedSession = session

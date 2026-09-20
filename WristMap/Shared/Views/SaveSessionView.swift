@@ -12,6 +12,7 @@ import CoreLocation
 struct SaveSessionView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
+    @Environment(WatchConnectivityManager.self) private var watchConnectivityManager
     @ObservedObject var tracker: LocationTracker
     
     @State private var isShowingSessionDiscard: Bool = false
@@ -129,7 +130,12 @@ struct SaveSessionView: View {
             
             try context.save()
             
+            #if os(watchOS)
+            watchConnectivityManager.syncSession(activeSession)
+            #endif
+            
             tracker.stopTracking()
+            isSessionActive = false
             
             dismiss()
         } catch {

@@ -10,11 +10,12 @@ import SwiftData
 
 struct HomeView_watchOS: View {
     @Environment(\.modelContext) private var context
+    @Environment(WatchConnectivityManager.self)
+    private var watchConnectivityManager
     @State private var locationManager = CLLocationManager()
     @State private var position: MapCameraPosition = .userLocation(followsHeading: false, fallback: .automatic)
     @State private var trackingMode: UserTrackingModes = .follow
     
-    @StateObject private var watchSession = WatchSessionManager()
     @State private var points: [GPXPoint] = []
     @State private var isRouteRecenterActive: Bool = false
     
@@ -41,8 +42,8 @@ struct HomeView_watchOS: View {
                         .stroke(.red, lineWidth: 4)
                 }
             }
-            .onChange(of: watchSession.receivedFile) {
-                guard let url = watchSession.receivedFile else { return }
+            .onChange(of: watchConnectivityManager.receivedFile) {
+                guard let url = watchConnectivityManager.receivedFile else { return }
                 
                 do {
                     try points = GPXParser().parse(url: url)
