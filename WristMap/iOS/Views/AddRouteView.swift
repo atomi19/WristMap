@@ -20,25 +20,35 @@ struct AddRouteView: View {
     
     var body: some View {
         NavigationStack {
-            Form {
-                TextField("Route Name", text: $routeName)
+            VStack(spacing: 0) {
+                // form
+                Form {
+                    Section("Route Details") {
+                        TextField("Route Name", text: $routeName)
+                    }
+                    
+                    if let draft = routeDraft {
+                        Section("GPX File") {
+                            Label(draft.fileName, systemImage: "map")
+                        }
+                    }
+                }
+                
+                // add gpx route button
                 if routeDraft == nil {
                     Button {
-                        isShowingFilePicker.toggle()
+                        isShowingFilePicker = true
                     } label: {
-                        HStack {
-                            Image(systemName: "map")
-                            Text("Add GPX File...")
-                        }
+                        Text("Add GPX File")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(.blue, in: Capsule())
                     }
                     .buttonStyle(.plain)
-                } else {
-                    if let draft = routeDraft {
-                        HStack {
-                            Image(systemName: "map")
-                            Text(draft.fileName)
-                        }
-                    }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 12)
                 }
             }
             .navigationTitle("Add Route")
@@ -67,7 +77,10 @@ struct AddRouteView: View {
                     Button("Confirm", systemImage: "checkmark") {
                         saveRoute()
                     }
-                    .disabled(routeName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .disabled(
+                        routeName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+                        routeDraft == nil
+                    )
                 }
             }
             .onDisappear {
