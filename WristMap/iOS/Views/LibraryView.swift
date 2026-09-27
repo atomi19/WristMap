@@ -243,6 +243,8 @@ struct SessionsListView: View {
             return filteredSessions.sorted { $0.distance < $1.distance }
         case .distanceHighToLow:
             return filteredSessions.sorted { $0.distance > $1.distance }
+        case .appleWatchOnly:
+            return filteredSessions.filter { $0.recordedOn == .appleWatch }
         }
     }
     
@@ -295,18 +297,30 @@ struct SessionsListView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Menu {
-                    Picker("Sort by", selection: $sortOptions) {
-                        Text("Most Recent First").tag(SessionSortOptions.dateCreated)
-                        Text("Distance High to Low").tag(SessionSortOptions.distanceHighToLow)
-                        Text("Distance Low to High").tag(SessionSortOptions.distanceLowToHigh)
-                        Text("Duration High to Low").tag(SessionSortOptions.durationHighToLow)
-                        Text("Duration Low to High").tag(SessionSortOptions.durationLowToHigh)
-                    }
-                    .onChange(of: sortOptions) {
-                        Settings.sessionSortOption = sortOptions
+                    Picker("Sort By", selection: $sortOptions) {
+                        Text("Newest First")
+                            .tag(SessionSortOptions.dateCreated)
+
+                        Text("Longest Distance")
+                            .tag(SessionSortOptions.distanceHighToLow)
+                        Text("Shortest Distance")
+                            .tag(SessionSortOptions.distanceLowToHigh)
+                        
+                        Text("Longest Duration")
+                            .tag(SessionSortOptions.durationHighToLow)
+                        Text("Shortest Duration")
+                            .tag(SessionSortOptions.durationLowToHigh)
+
+                        Text("Apple Watch Only")
+                            .tag(SessionSortOptions.appleWatchOnly)
                     }
                 } label: {
-                    Image(systemName: "line.3.horizontal.decrease")
+                    if sortOptions == .appleWatchOnly {
+                        Image(systemName: "applewatch")
+                            .foregroundStyle(.blue)
+                    } else {
+                        Image(systemName: "line.3.horizontal.decrease")
+                    }
                 }
             }
         }
@@ -324,6 +338,12 @@ struct SessionsListView: View {
                 }
             } else if sortedSessions.isEmpty && !searchText.isEmpty {
                 ContentUnavailableView.search(text: searchText)
+            } else if sortedSessions.isEmpty && sortOptions == .appleWatchOnly {
+                ContentUnavailableView {
+                    Label("No Sessions from Apple Watch", systemImage: "applewatch")
+                } description: {
+                    Text("Make sure your Apple Watch is near your iPhone to sync sessions")
+                }
             }
         }
         .deleteConfirmation(

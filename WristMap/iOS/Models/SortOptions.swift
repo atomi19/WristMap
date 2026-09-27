@@ -18,4 +18,5 @@ enum SessionSortOptions: String, CaseIterable {
     case distanceLowToHigh
     case durationHighToLow
     case durationLowToHigh
+    case appleWatchOnly
 }
