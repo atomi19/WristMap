@@ -54,10 +54,12 @@ struct SessionDetailsView: View {
                     }
                     .padding()
                     if session.recordedOn == .appleWatch {
-                        HStack(alignment: .center) {
+                        HStack() {
                             Image(systemName: "applewatch")
                             Text("Imported from Apple Watch")
                         }
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .center)
                     }
                 }
             }
