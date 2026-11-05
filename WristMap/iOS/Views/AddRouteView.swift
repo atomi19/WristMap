@@ -16,7 +16,6 @@ struct AddRouteView: View {
     @State private var isShowingFilePicker = false
     @State private var routeDraft: RouteDraft?
     @State private var isShowingDiscardDialog = false
-    @State private var didUserSavedRoute = false
     
     var body: some View {
         NavigationStack {
@@ -30,6 +29,16 @@ struct AddRouteView: View {
                     if let draft = routeDraft {
                         Section("GPX File") {
                             Label(draft.fileName, systemImage: "map")
+                                .swipeActions(
+                                    edge: .trailing,
+                                    allowsFullSwipe: false
+                                ) {
+                                    Button(role: .destructive) {
+                                        deleteTemporaryGPX()
+                                    } label: {
+                                        Label("Delete", systemImage: "trash")
+                                    }
+                                }
                         }
                     }
                 }
@@ -85,11 +94,7 @@ struct AddRouteView: View {
             }
             .onDisappear {
                 // delete temporary file if user discarded route (picked file, but did not saved)
-                if !didUserSavedRoute && routeDraft != nil {
-                    if let draft = routeDraft {
-                        try? FileManager.default.removeItem(at: draft.temporaryGPXURL)
-                    }
-                }
+                deleteTemporaryGPX()
             }
             .fileImporter(
                 isPresented: $isShowingFilePicker,
@@ -110,32 +115,32 @@ struct AddRouteView: View {
     private func saveRoute() {
         guard let draft = routeDraft else { return }
         
+        let route = Route(
+            routeName: routeName,
+            gpxFilename: "",
+            distance: draft.distance
+        )
+        
         do {
-            let route = Route(
-                routeName: routeName,
-                gpxFilename: "",
-                distance: draft.distance
-            )
-            
             try GPXFileManager.saveGPX(
                 from: draft.temporaryGPXURL,
                 routeFileId: route.uuid
             )
             context.insert(route)
             
-            try context.save()
+            do {
+                try context.save()
+            } catch {
+                context.delete(route)
+                GPXFileManager.deleteGPXFile(for: route.uuid)
+                throw error
+            }
             
-            // remove temporary file
-            try? FileManager.default.removeItem(at: draft.temporaryGPXURL)
-            
-            routeDraft = nil
+            deleteTemporaryGPX()
             routeName = ""
-            
-            didUserSavedRoute = true
-            
             dismiss()
         } catch {
-            print(error)
+            print("Failed to save route: \(error)")
         }
     }
     
@@ -170,6 +175,16 @@ struct AddRouteView: View {
         } catch {
             print(error)
         }
+    }
+    
+    private func deleteTemporaryGPX() {
+        guard let draft = routeDraft else {return}
+        
+        try? FileManager.default.removeItem(
+            at: draft.temporaryGPXURL
+        )
+        
+        routeDraft = nil
     }
 }
 

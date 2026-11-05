@@ -182,6 +182,7 @@ struct RoutesListView: View {
         .sheet(isPresented: $isShowingAddRoute) {
             AddRouteView()
                 .presentationDetents([.medium])
+                .interactiveDismissDisabled()
         }
         .sheet(item: $routeToEdit) { route in
             EditRouteView(route: route)
