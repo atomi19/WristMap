@@ -165,6 +165,7 @@ struct HomeView_iOS: View {
                 selectedDetents: $sessionRecordDetent,
                 isSessionActive: $shouldOpenSessionRecordBack
             )
+            .presentationCompactAdaptation(.sheet)
         case .sessionDetails:
             if let session = sessionManager.selectedSession {
                 SessionDetailsView(
