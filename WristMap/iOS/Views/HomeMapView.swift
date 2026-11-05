@@ -89,6 +89,11 @@ struct HomeMapView: View {
                             var camera = currentCamera
                             camera.heading = 0
                             
+                            // set tracking mode to follow if user clicks compass button while in follow with heading mode
+                            if trackingMode == .followWithHeading {
+                                trackingMode = .follow
+                            }
+                            
                             withAnimation(.easeInOut) {
                                 position = .camera(camera)
                             }
