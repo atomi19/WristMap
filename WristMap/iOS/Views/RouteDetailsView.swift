@@ -48,13 +48,16 @@ struct RouteDetailsView: View {
         }
         
         // optimize max 200 elevation points
-        let optimizedElevationPoints = optimizeElevationPoints(points: allPoints, targetCount: 200)
+        let optimizedElevationPoints = RouteDistanceMarkerCalculator.optimizeElevationPoints(
+            points: allPoints,
+            targetCount: 200
+        )
         return optimizedElevationPoints
     }
     private var maxElevation: Double { elevationPoints.map(\.elevation).max() ?? 0 }
     private var minElevation: Double { elevationPoints.map(\.elevation).min() ?? 0 }
     private var gainAndLoss: (gain: Double, loss: Double) {
-        calculateGainAndLoss(points: elevationPoints)
+        RouteDistanceMarkerCalculator.calculateGainAndLoss(points: elevationPoints)
     }
     
     var body: some View {
@@ -102,38 +105,6 @@ struct RouteDetailsView: View {
             ],
             selectedDetent: $selectedDetents
         )
-    }
-    
-    // optimize elevation points to max 200
-    private func optimizeElevationPoints(
-        points: [ElevationPoint],
-        targetCount: Int
-    ) -> [ElevationPoint] {
-        guard points.count > targetCount,
-              let first = points.first,
-              let last = points.last
-        else { return points }
-        
-        let totalDistance = last.distance
-        let interval = totalDistance / Double(targetCount - 1)
-        
-        var result: [ElevationPoint] = [first]
-        result = []
-        
-        var nextDistance = interval
-        
-        for point in points {
-            if point.distance >= nextDistance {
-                result.append(point)
-                nextDistance += interval
-            }
-        }
-        
-        if result.last?.distance != last.distance {
-            result.append(last)
-        }
-        
-        return result
     }
     
     private var elevationSummary: some View {
@@ -207,37 +178,4 @@ struct RouteDetailsView: View {
             .padding()
         }
     }
-    
-    // calculate gain and loss evelation
-    private func calculateGainAndLoss(points: [ElevationPoint]) -> (gain: Double, loss: Double) {
-        guard points.count > 1 else { return (0, 0) }
-        
-        let threshold: Double = 2.0
-        
-        var gain = 0.0
-        var loss = 0.0
-        var lastSignificantElevation = points[0].elevation
-        
-        for point in points.dropFirst() {
-            let delta = point.elevation - lastSignificantElevation
-            
-            if abs(delta) >= threshold {
-                if delta > 0 {
-                    gain += delta
-                } else {
-                    loss += abs(delta)
-                }
-                
-                lastSignificantElevation = point.elevation
-            }
-        }
-        
-        return (gain, loss)
-    }
-}
-
-struct ElevationPoint: Identifiable {
-    var id = UUID()
-    var distance: Double // in meters
-    var elevation: Double // in meters
 }

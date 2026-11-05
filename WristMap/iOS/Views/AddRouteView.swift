@@ -159,8 +159,7 @@ struct AddRouteView: View {
             )
             
             let points = try GPXParser().parse(url: url)
-            
-            let distance = calculateDistance(points: points)
+            let distance = RouteDistanceMarkerCalculator.calculateDistance(points: points)
             
             routeDraft = RouteDraft(
                 routeName: routeName,
@@ -171,27 +170,6 @@ struct AddRouteView: View {
         } catch {
             print(error)
         }
-    }
-    
-    private func calculateDistance(points: [GPXPoint]) -> Double{
-        guard points.count > 1 else { return 0 }
-        
-        var total: Double = 0
-        
-        for i in 1..<points.count {
-            let start = CLLocation(
-                latitude: points[i - 1].coordinate.latitude,
-                longitude: points[i - 1].coordinate.longitude
-            )
-            
-            let end = CLLocation(
-                latitude: points[i].coordinate.latitude,
-                longitude: points[i].coordinate.longitude
-            )
-            
-            total += start.distance(from: end)
-        }
-        return total
     }
 }
 
