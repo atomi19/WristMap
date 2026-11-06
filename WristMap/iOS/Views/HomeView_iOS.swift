@@ -157,6 +157,7 @@ struct HomeView_iOS: View {
                     },
                     recenter: recenterOnRoute,
                 )
+                .presentationCompactAdaptation(.sheet)
             }
         case .sessionRecord:
             SessionRecordView(

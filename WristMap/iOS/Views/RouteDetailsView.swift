@@ -62,16 +62,16 @@ struct RouteDetailsView: View {
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 24) {
-                // show chart only if sheet is expanded
-                if selectedDetents != SheetDetent.compact {
-                    elevationSummary
+            ScrollView {
+                VStack(spacing: 24) {
+                    // show chart only if sheet is expanded
+                    if selectedDetents != SheetDetent.compact {
+                        elevationSummary
+                    }
+                    if selectedDetents == .large {
+                        elevationChart
+                    }
                 }
-                if selectedDetents == .large {
-                    elevationChart
-                }
-                
-                Spacer()
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
