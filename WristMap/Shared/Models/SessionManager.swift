@@ -70,13 +70,12 @@ final class SessionManager {
         
         do {
             try context.save()
+            selectedSession = session
         } catch {
             print("Failed to create session: \(error)")
             context.delete(session)
             selectedSession = nil
         }
-        
-        selectedSession = session
     }
     
     func deleteSession(context: ModelContext, session: Session) {

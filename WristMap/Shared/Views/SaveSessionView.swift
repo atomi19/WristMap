@@ -13,6 +13,8 @@ struct SaveSessionView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
     @Environment(WatchConnectivityManager.self) private var watchConnectivityManager
+    @Environment(ErrorPresenter.self) private var errorPresenter
+    
     @ObservedObject var tracker: LocationTracker
     
     @State private var isShowingSessionDiscard: Bool = false
@@ -54,7 +56,11 @@ struct SaveSessionView: View {
                                 isSessionActive = false
                                 dismiss()
                             } catch {
-                                print(error)
+                                errorPresenter.present(
+                                    error,
+                                    title: "Failed to discard session",
+                                    message: error.localizedDescription
+                                )
                             }
                         }
                     }

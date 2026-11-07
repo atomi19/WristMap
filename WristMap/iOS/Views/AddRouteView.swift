@@ -11,6 +11,7 @@ import CoreLocation
 struct AddRouteView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
+    @Environment(ErrorPresenter.self) private var errorPresenter
     
     @State private var routeName = ""
     @State private var isShowingFilePicker = false
@@ -140,7 +141,11 @@ struct AddRouteView: View {
             routeName = ""
             dismiss()
         } catch {
-            print("Failed to save route: \(error)")
+            errorPresenter.present(
+                error,
+                title: "Failed to save route",
+                message: error.localizedDescription
+            )
         }
     }
     
@@ -173,7 +178,11 @@ struct AddRouteView: View {
                 distance: distance
             )
         } catch {
-            print(error)
+            errorPresenter.present(
+                error,
+                title: "Failed to import file",
+                message: error.localizedDescription
+            )
         }
     }
     

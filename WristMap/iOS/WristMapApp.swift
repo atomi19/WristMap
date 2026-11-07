@@ -10,6 +10,7 @@ import SwiftData
 struct WristMapApp: App {
     private let modelContainer: ModelContainer
     @State private var watchConnectivityManager: WatchConnectivityManager
+    @State private var errorPresenter = ErrorPresenter()
     
     // app theme
     @AppStorage(Settings.Keys.appTheme)
@@ -32,7 +33,13 @@ struct WristMapApp: App {
         WindowGroup {
             HomeView_iOS()
                 .environment(watchConnectivityManager)
+                .environment(errorPresenter)
                 .preferredColorScheme(appTheme.colorScheme)
+                .alert(error: $errorPresenter.error) {_ in  
+                    Button("OK", role: .cancel) {}
+                } message: { error in
+                    Text(error.failureReason ?? "")
+                }
         }
         .modelContainer(modelContainer)
     }

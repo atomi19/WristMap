@@ -22,6 +22,7 @@ enum ActiveSheet: Identifiable {
 
 struct HomeView_iOS: View {
     @Environment(\.modelContext) private var context
+    @Environment(ErrorPresenter.self) private var errorPresenter
     
     @StateObject private var tracker = LocationTracker()
     @State private var viewModel = HomeViewModel()
@@ -81,7 +82,11 @@ struct HomeView_iOS: View {
                     activeSheet = .routeDetails
                 } catch {
                     viewModel.points = []
-                    print(error)
+                    errorPresenter.present(
+                        error,
+                        title: "Failed to load route",
+                        message: error.localizedDescription
+                    )
                 }
             }
             .onChange(of: selectedMapStyle) {

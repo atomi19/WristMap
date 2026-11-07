@@ -9,6 +9,7 @@ import SwiftData
 struct EditRouteView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
+    @Environment(ErrorPresenter.self) private var errorPresenter
     
     @State private var name: String
     let route: Route
@@ -34,7 +35,11 @@ struct EditRouteView: View {
                             try context.save()
                             dismiss()
                         } catch {
-                            print(error)
+                            errorPresenter.present(
+                                error,
+                                title: "Failed to save route",
+                                message: error.localizedDescription
+                            )
                         }
                     }
                 )

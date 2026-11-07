@@ -9,6 +9,7 @@ import SwiftData
 struct EditSessionView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
+    @Environment(ErrorPresenter.self) private var errorPresenter
     
     @State private var name: String
     let session: Session
@@ -34,7 +35,11 @@ struct EditSessionView: View {
                             try context.save()
                             dismiss()
                         } catch {
-                            print(error)
+                            errorPresenter.present(
+                                error,
+                                title: "Failed to save session",
+                                message: error.localizedDescription
+                            )
                         }
                     }
                 )
