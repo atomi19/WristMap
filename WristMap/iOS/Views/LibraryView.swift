@@ -225,8 +225,10 @@ struct SessionsListView: View {
     var sessions: [Session]
     private var sortedSessions: [Session] {
         let filteredSessions: [Session] = sessions.filter { session in
-            searchText.isEmpty || // all sessions
-            session.name.localizedStandardContains(searchText) // found sessions
+            session.finishedAt != nil && (
+                searchText.isEmpty || // all sessions
+                session.name.localizedStandardContains(searchText) // found sessions
+            )
         }
         
         switch sortOptions {
