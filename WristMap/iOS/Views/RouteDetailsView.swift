@@ -48,31 +48,37 @@ struct RouteDetailsView: View {
         }
         
         // optimize max 200 elevation points
-        let optimizedElevationPoints = RouteDistanceMarkerCalculator.optimizeElevationPoints(
+        let optimizedElevationPoints = ElevationCalculator.optimizeElevationPoints(
             points: allPoints,
             targetCount: 200
         )
+        
         return optimizedElevationPoints
     }
+    
     private var maxElevation: Double { elevationPoints.map(\.elevation).max() ?? 0 }
     private var minElevation: Double { elevationPoints.map(\.elevation).min() ?? 0 }
     private var gainAndLoss: (gain: Double, loss: Double) {
-        RouteDistanceMarkerCalculator.calculateGainAndLoss(points: elevationPoints)
+        ElevationCalculator.calculateGainAndLoss(points: elevationPoints)
     }
     
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 24) {
-                    // show chart only if sheet is expanded
+                VStack(alignment: .leading, spacing: 24) {
                     if selectedDetents != SheetDetent.compact {
+                        routeOverview
                         elevationSummary
                     }
+                    
                     if selectedDetents == .large {
-                        elevationChart
+                        elevationChartSection
                     }
                 }
+                .padding(.horizontal)
+                .padding(.vertical, 16)
             }
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button(action: onClose) {
@@ -107,75 +113,68 @@ struct RouteDetailsView: View {
         )
     }
     
-    private var elevationSummary: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 16) {
-                SessionDetailsTextView(
-                    label: "Elevation Gain",
-                    dataText: "\(DataFormatter.elevation(gainAndLoss.gain))"
-                )
-                SessionDetailsTextView(
-                    label: "Elevation Loss",
-                    dataText: "\(DataFormatter.elevation(gainAndLoss.loss))"
-                )
-            }
-            
-            Spacer()
-            
-            VStack(alignment: .leading, spacing: 16) {
-                SessionDetailsTextView(
-                    label: "Max Elevation",
-                    dataText: "\(DataFormatter.elevation(maxElevation))"
-                )
-                SessionDetailsTextView(
-                    label: "Min Elevation",
-                    dataText: "\(DataFormatter.elevation(minElevation))"
-                )
-            }
-        }
-        .padding(.horizontal)
+    private var routeOverview: some View {
+        metric(
+            "Distance",
+            DataFormatter.distance(route.distance)
+        )
     }
     
-    private var elevationChart: some View {
-        VStack(alignment: .leading, spacing: 8) {
+    private var elevationSummary: some View {
+        VStack(alignment: .leading, spacing: 12) {
             Text("Elevation")
                 .font(.headline)
-                .padding(.horizontal)
-            
-            Chart(elevationPoints) { point in
-                LineMark(
-                    x: .value("Distance", point.distance),
-                    y: .value("Elevation", point.elevation)
+
+            LazyVGrid(
+                columns: [
+                    GridItem(.flexible()),
+                    GridItem(.flexible())
+                ],
+                alignment: .leading,
+                spacing: 20
+            ) {
+                metric(
+                    "Elevation Gain",
+                    DataFormatter.elevation(gainAndLoss.gain)
+                )
+                metric(
+                    "Elevation Loss",
+                    DataFormatter.elevation(gainAndLoss.loss)
+                )
+                metric(
+                    "Max Elevation",
+                    DataFormatter.elevation(maxElevation)
+                )
+                metric(
+                    "Min Elevation",
+                    DataFormatter.elevation(minElevation)
                 )
             }
-            // limit x by start and end of route (so there is no padding inside the chart)
-            .chartXScale(domain: elevationPoints.first!.distance...elevationPoints.last!.distance)
-            .chartXAxis {
-                AxisMarks { value in
-                    AxisGridLine()
-                    AxisTick()
-                    
-                    AxisValueLabel {
-                        if let distance = value.as(Double.self) {
-                            Text(DataFormatter.shortDistance(distance))
-                        }
-                    }
-                }
-            }
-            .chartYAxis {
-                AxisMarks(position: .leading) { value in
-                    AxisGridLine()
-                    AxisTick()
-                    
-                    AxisValueLabel {
-                        if let elevation = value.as(Double.self) {
-                            Text(DataFormatter.shortDistance(elevation))
-                        }
-                    }
-                }
-            }
-            .frame(height: 150)
-            .padding()
         }
+    }
+    
+    private var elevationChartSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Elevation Profile")
+                .font(.headline)
+            
+            ElevationChart(elevationPoints: elevationPoints)
+        }
+    }
+    
+    private func metric(
+        _ label: String,
+        _ value: String
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            Text(value)
+                .font(.title3.weight(.semibold))
+                .monospacedDigit()
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
