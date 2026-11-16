@@ -51,6 +51,9 @@ final class SessionManager {
         }
         
         activeSession.sessionPoints.append(contentsOf: newPoints)
+        activeSession.sessionPoints.sort {
+            $0.timestamp < $1.timestamp
+        }
         
         do {
             try context.save()

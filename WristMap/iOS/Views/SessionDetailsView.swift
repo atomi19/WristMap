@@ -15,6 +15,56 @@ struct SessionDetailsView: View {
     let onClose: () -> Void
     let recenter: ([CLLocationCoordinate2D]) -> Void
     
+    private var maxElevation: Double { session.sessionPoints.map(\.elevation).max() ?? 0 }
+    private var minElevation: Double { session.sessionPoints.map(\.elevation).min() ?? 0 }
+    private var gainAndLoss: (gain: Double, loss: Double) {
+        ElevationCalculator.calculateGainAndLoss(points: elevationPoints)
+    }
+    
+    var elevationPoints: [ElevationPoint] {
+        let sortedPoints = session.sessionPoints.sorted { $0.timestamp < $1.timestamp }
+        guard sortedPoints.count > 1 else { return [] }
+        
+        var allPoints: [ElevationPoint] = []
+        var distance = 0.0
+        
+        for i in sortedPoints.indices {
+            let point = sortedPoints[i]
+            
+            if i > 0 {
+                let previous = sortedPoints[i-1]
+                
+                let previousLocation = CLLocation(
+                    latitude: previous.latitude,
+                    longitude: previous.longitude
+                )
+
+                let currentLocation = CLLocation(
+                    latitude: point.latitude,
+                    longitude: point.longitude
+                )
+
+                // calculate distance for this point
+                distance += previousLocation.distance(from: currentLocation)
+            }
+            
+            allPoints.append(
+                ElevationPoint(
+                    distance: distance, // distance in meters
+                    elevation: point.elevation
+                )
+            )
+        }
+        
+        // optimize max 200 elevation points
+        let optimizedElevationPoints = ElevationCalculator.optimizeElevationPoints(
+            points: allPoints,
+            targetCount: 200
+        )
+        
+        return optimizedElevationPoints
+    }
+    
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -25,6 +75,8 @@ struct SessionDetailsView: View {
                     }
                     
                     if selectedDetents == .large {
+                        elevationSummary
+                        elevationChartSection
                         sourceInformation
                     }
                 }
@@ -94,9 +146,51 @@ struct SessionDetailsView: View {
         }
     }
     
+    private var elevationSummary: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Elevation")
+                .font(.headline)
+
+            LazyVGrid(
+                columns: [
+                    GridItem(.flexible()),
+                    GridItem(.flexible())
+                ],
+                alignment: .leading,
+                spacing: 20
+            ) {
+                metric(
+                    "Elevation Gain",
+                    DataFormatter.elevation(gainAndLoss.gain)
+                )
+                metric(
+                    "Elevation Loss",
+                    DataFormatter.elevation(gainAndLoss.loss)
+                )
+                metric(
+                    "Max Elevation",
+                    DataFormatter.elevation(maxElevation)
+                )
+                metric(
+                    "Min Elevation",
+                    DataFormatter.elevation(minElevation)
+                )
+            }
+        }
+    }
+    
+    private var elevationChartSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Elevation Profile")
+                .font(.headline)
+
+            ElevationChart(elevationPoints: elevationPoints)
+        }
+    }
+    
     @ViewBuilder
     private var sourceInformation: some View {
-        if true {
+        if session.recordedOn == .appleWatch {
             HStack(spacing: 6) {
                 Image(systemName: "applewatch")
                 Text("Imported from Apple Watch")

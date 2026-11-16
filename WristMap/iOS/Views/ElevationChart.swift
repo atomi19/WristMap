@@ -17,8 +17,10 @@ struct ElevationChart: View {
                     y: .value("Elevation", point.elevation)
                 )
             }
-            // limit x by start and end of route (so there is no padding inside the chart)
-            .chartXScale(domain: elevationPoints.first!.distance...elevationPoints.last!.distance)
+            // limit x by start and end of route (so there is no padding
+            .chartXScale(
+                domain: 0...max(elevationPoints.last?.distance ?? 0, 1)
+            )
             .chartXAxis {
                 AxisMarks { value in
                     AxisGridLine()
@@ -26,7 +28,11 @@ struct ElevationChart: View {
                     
                     AxisValueLabel {
                         if let distance = value.as(Double.self) {
-                            Text(DataFormatter.shortDistance(distance))
+                            Text(
+                                distance >= 1000
+                                ? String(format: "%.1f km", distance / 1000)
+                                : "\(Int(distance)) m"
+                            )
                         }
                     }
                 }
