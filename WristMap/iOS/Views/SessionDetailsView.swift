@@ -65,6 +65,10 @@ struct SessionDetailsView: View {
         return optimizedElevationPoints
     }
     
+    private var averageMovingSpeed: Double {
+        session.movingDuration > 0 ? session.distance / session.movingDuration : 0
+    }
+    
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -127,9 +131,13 @@ struct SessionDetailsView: View {
             spacing: 20
         ) {
             metric("Distance", DataFormatter.distance(session.distance))
-            metric("Duration", DataFormatter.duration(session.duration))
-            metric("Avg Speed", DataFormatter.speed(session.averageSpeed))
             metric("Max Speed", DataFormatter.speed(session.maxSpeed))
+            
+            metric("Duration", DataFormatter.duration(session.duration))
+            metric("Moving Duration", DataFormatter.duration(session.movingDuration))
+            
+            metric("Avg Speed", DataFormatter.speed(session.averageSpeed))
+            metric("Avg Moving Speed", DataFormatter.speed(averageMovingSpeed))
         }
     }
     

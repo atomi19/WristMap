@@ -110,6 +110,23 @@ struct SaveSessionView: View {
         }
     }
     
+    private func movingDuration(of points: [SessionPoint]) -> TimeInterval {
+        let minSpeed: Double = 0.5,
+            maxGap: TimeInterval = 10
+
+        let sortedPoints = points.sorted { $0.timestamp < $1.timestamp }
+        var total: TimeInterval = 0
+        
+        for (previous, current) in zip(sortedPoints, sortedPoints.dropFirst()) {
+            let delta = current.timestamp.timeIntervalSince(previous.timestamp)
+            guard delta > 0, delta <= maxGap else {continue}
+            guard current.speed >= minSpeed else {continue}
+            total+=delta
+        }
+        
+        return total;
+    }
+    
     private func saveSession(_ activeSession: Session) {
         do {
             let points = tracker.locationHistory.map {location in
@@ -133,6 +150,7 @@ struct SaveSessionView: View {
             activeSession.movingDuration = 0
             activeSession.averageSpeed = tracker.averageSpeed
             activeSession.maxSpeed = tracker.maxSpeed
+            activeSession.movingDuration = movingDuration(of: points)
             
             try context.save()
             
